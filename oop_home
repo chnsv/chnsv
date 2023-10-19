@@ -1,0 +1,66 @@
+//MAIN
+package interfacebody_1;
+import java.util.*;
+
+public class InterfaceBody_1 {
+    public static void main(String[] args) {
+        Figura [] f;
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Entter count el: ");
+        int k = sc.nextInt();
+        f = new Figura[k];
+        for(int i = 0;i<k;i++){
+            System.out.println("1 - kvadrat, 2 - pr-ik, 3 - 4-ugolnik");
+            int p = sc.nextInt();
+            if(p==1){
+                System.out.println("Enter a: ");
+                int a = sc.nextInt();
+                Kvadrat kvadrat = new Kvadrat(a);
+                f[i] = kvadrat;
+            }
+            if(p==2){
+                System.out.println("Enter storonu: ");
+                int a = sc.nextInt();
+                int b = sc.nextInt();
+                Primaugol primaugol = new Primaugol(a,b);
+                f[i]=primaugol;
+            }
+        }
+        for(int i = 0;i<k;i++){
+            f[i].print();
+            System.out.println("P = " + f[i].P()+" "+"S= "+f[i].S());
+    }
+    
+}
+// FIGURA INTERFACE
+package interfacebody_1;
+
+public interface Figura {
+    double P();
+    double S();
+    void print();
+}
+//KVADRAT
+package interfacebody_1;
+
+public class Kvadrat implements Figura{
+    double a;
+    Kvadrat(double a){
+        this.a=a;
+    }
+    public double P(){
+        return a*4;
+    }
+    public double S(){
+        return a*a;
+    }
+    public void print(){
+        System.out.println("Kvadrat = "+a);
+    }
+}
+//PRIMAUGOL
+package interfacebody_1;
+
+public class Primaugol extends Kvadrat implements Figura{
+    
+}
