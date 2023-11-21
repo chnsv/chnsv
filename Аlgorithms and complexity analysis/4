@@ -1,0 +1,169 @@
+#include <iostream>
+#include <ctime>
+using namespace std;
+
+class Laba4
+{
+    public:
+        long long int count = 0;
+
+        void hoarasortschet(int* a, int first, int last)
+        {
+            int i = first;
+            int j = last;
+            double temp, x = a[(first + last) / 2];
+            count += 3;
+            do
+            {
+                while (a[i] < x)
+                {
+                    i++;
+                    count += 2;
+                }
+                while (a[j] > x)
+                {
+                    j--;
+                    count += 2;
+                }
+                if (i <= j)
+                {
+                    if (i < j)
+                    {
+                        temp = a[i];
+                        a[i] = a[j];
+                        a[j] = temp;
+                        count += 3;
+                    }
+                    i++;
+                    j--;
+                    count += 3;
+                }
+                count++;
+            } while (i <= j);
+            if (i < last)
+                hoarasortschet(a, i, last);
+            if (first < j)
+                hoarasortschet(a, first, j);
+            count += 2;
+        }
+
+        void hoarasort(int* a, int first, int last)
+        {
+            int i = first;
+            int j = last;
+            double temp, x = a[(first + last) / 2];
+            do
+            {
+                while (a[i] < x)
+                {
+                    i++;
+                }
+                while (a[j] > x)
+                {
+                    j--;
+                }
+                if (i <= j)
+                {
+                    if (i < j)
+                    {
+                        temp = a[i];
+                        a[i] = a[j];
+                        a[j] = temp;
+                    }
+                    i++;
+                    j--;
+                }
+            } while (i <= j);
+            if (i < last)
+                hoarasort(a, i, last);
+            if (first < j)
+                hoarasort(a, first, j);
+        }
+
+        void antisort(int* a, int first, int last, int n)
+        {
+            hoarasort(a, first, last);
+            for (int i = 0; i < n; i++)
+            {
+                swap(a[i], a[i / 2]);
+            }
+
+        }
+
+        void T_mean()
+        {
+            cout << "T(mean)" << endl;
+            cout << "n   count" << endl;
+            for (int n = 100; n <= 10000; n += 100)
+            {
+                for (int n1 = 0; n1 < 1000; n1++)
+                {
+                    int* a = new int[n];
+                    for (int i = 0; i < n; i++)
+                        a[i] = rand() % 101;
+                    hoarasortschet(a, 0, n - 1);
+                }
+                count /= 1000;
+
+                cout << n << "; " << count << endl;
+                count = 0;
+            }
+        }
+
+        void T_min()
+        {
+            cout << "T(min)" << endl;
+            cout << "n   count" << endl;
+            for (int n = 100; n <= 10000; n += 100)
+            {
+                for (int n1 = 0; n1 < 1000; n1++)
+                {
+                    int* arr = new int[n];
+                    for (int i = 0; i < n; i++)
+                        arr[i] = rand() % 101;
+                    hoarasort(arr, 0, n - 1);
+                    hoarasortschet(arr, 0, n - 1);
+                }
+                count /= 1000;
+
+                cout << n << "; " << count << endl;
+                count = 0;
+            }
+        }
+
+        void T_max()
+        {
+            cout << "T(max)" << endl;
+            cout << "n   count" << endl;
+            for (int n = 100; n <= 10000; n += 100)
+            {
+                for (int n1 = 0; n1 < 1000; n1++)
+                {
+                    int* arr = new int[n];
+                    for (int i = 0; i < n; i++)
+                        arr[i] = 0;
+                    antisort(arr, 0, n - 1, n);
+                    hoarasortschet(arr, 0, n - 1);
+                }
+                count /= 1000;
+
+                cout << n << "; " << count << endl;
+                count = 0;
+            }
+        }
+
+        void itog()
+        {
+            srand(time(NULL));
+            T_min();
+            T_mean();
+            T_max();
+        }
+};
+
+int main()
+{
+    Laba4 num4;
+    num4.itog();
+
+}
