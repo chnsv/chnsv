@@ -1,0 +1,112 @@
+#include <iostream>
+using namespace std;
+
+void DFS(int** edge, int v, bool* visited, int n) {
+	visited[v] = true;
+
+	for (int i = 0; i < n; i++) {
+		if (edge[v][i] == 1 && !visited[i]) {
+			DFS(edge, i, visited, n);
+		}
+	}
+}
+
+bool GraphConnectivity(int** edge, int n) {
+	bool* visited = new bool[n];
+	for (int i = 0; i < n; i++) {
+		visited[i] = false;
+	}
+	DFS(edge, 0, visited, n);
+
+	for (int i = 0; i < n; i++) {
+		if (!visited[i]) {
+			delete[] visited;
+			return false;
+		}
+	}
+	delete[] visited;
+	return true;
+}
+
+bool AcyclicityGraph(int** edge, int v, bool* visited, int parent, int n) {
+	visited[v] = true;
+	for (int i = 0; i < n; i++) {
+		if (edge[v][i] == 1) {
+			if (!visited[i]) {
+				if (AcyclicityGraph(edge, i, visited, v, n)) {
+					return true;
+				}
+			}
+			else if (i != parent) {
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+bool isAcyclicityGraph(int** edge, int n) {
+	bool* visited = new bool[n];
+	for (int i = 0; i < n; i++) {
+		visited[i] = false;
+	}
+
+	for (int i = 0; i < n; i++) {
+		if (!visited[i]) {
+			if (AcyclicityGraph(edge, i, visited, -1, n)) {
+				delete[] visited;
+				return false;
+			}
+		}
+	}
+	delete[] visited;
+	return true;
+}
+
+int main() {
+	setlocale(LC_ALL, "Rus");
+	int n;
+	cout << "Количество вершин: ";
+	cin >> n;
+	int** a = new int* [n];
+	for (int i = 0; i < n; i++)
+	{
+		a[i] = new int[n];
+	}
+	cout << "Матрица смежности графа с " << n << " вершинами: " << endl;
+	for (int i = 0; i < n; i++)
+		for (int j = 0; j < n; j++)
+		{
+			cin >> a[i][j];
+		}
+	if (GraphConnectivity(a, n))
+	{
+		cout << "Граф является связным, ";
+	}
+	else
+	{
+		cout << "Граф является не связным, ";
+	}
+
+	if (isAcyclicityGraph(a, n)) {
+		cout << " ациклическим";
+	}
+	else {
+		cout << " не ациклическим";
+	}
+
+	if (GraphConnectivity(a, n) && isAcyclicityGraph(a, n))
+	{
+		cout << ", поэтому граф является деревом" << endl;
+	}
+	if (!GraphConnectivity(a, n) && isAcyclicityGraph(a, n) || GraphConnectivity(a, n) && !isAcyclicityGraph(a, n) || !GraphConnectivity(a, n) && !isAcyclicityGraph(a, n))
+	{
+		cout << ", поэтому граф является не деревом" << endl;
+	}
+	for (int i = 0; i < n; i++)
+	{
+		delete[] a[i];
+	}
+	delete[] a;
+	return 0;
+}
