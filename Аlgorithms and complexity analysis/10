@@ -1,0 +1,119 @@
+#include<iostream>
+#include<vector>
+#include<ctime>
+#include<fstream>
+
+using namespace std;
+int k = 0;
+
+void g2(int n, vector<vector<int>> G1, vector<vector<int>> G2)
+{
+	int a, b, x;
+	for (int kol = 0; kol < n - 1; kol++) {
+		vector<int>temp(n, 0);
+		a = rand() % n;
+		b = rand() % n;
+		G2.resize(n);
+		for (int j = 0; j < n; j++) {
+			x = G2[b][j];
+			G2[b][j] = G2[a][j];
+			G2[a][j] = x;
+		}
+		for (int j = 0; j < n; j++) {
+			x = G2[j][b];
+			G2[j][b] = G2[j][a];
+			G2[j][a] = x;
+		}
+	}
+}
+
+void sortpuz(int n, vector<int> v1, vector<int> v2)
+{
+	int temp;
+	for (int i = n - 1; i > 0; i--) {
+		for (int j = 0; j < i; j++) {
+			k += 2;
+			if (v1[j] > v1[j + 1]) {
+				temp = v1[j];
+				v1[j] = v2[j + 1];
+				v1[j + 1] = temp;
+				k += 5;
+			}
+			k += 2;
+			if (v2[j] > v2[j + 1]) {
+				temp = v2[j];
+				v2[j] = v2[j + 1];
+				v2[j + 1] = temp;
+				k += 5;
+			}
+		}
+	}
+}
+
+bool proverka(int n, vector<vector<int>> G1, vector<vector<int>> G2)
+{
+	vector<int> v1;
+	vector<int> v2;
+	v1.resize(n);
+	v2.resize(n);
+	for (int i = 0; i < n; i++) {
+		int count = 0, count1 = 0;
+		for (int j = 0; j < n; j++) {
+			if (G1[i][j] == 1) { 
+				count++; 
+				k++; 
+			}
+			k++;
+			if (G2[i][j] == 1) { 
+				count1++; 
+				k++; 
+			}
+			k++;
+		}
+		v1[i] = count; 
+		k++;
+		v2[i] = count1; 
+		k++;
+		k++;
+		if (count != count1)
+		{
+			return false;
+		}
+		sortpuz(n, v1, v2);
+		k++;
+		if (v1 != v2)
+			return false;
+		count = 0; 
+		count1 = 0; 
+		k += 2;
+	}
+	return true;
+}
+int main() {
+	ofstream f("f.txt");
+	srand(time(NULL));
+	int n, sum;
+	for (n = 1; n <= 20; n++) {
+		sum = 0;
+		for (int i = 0; i < 10; i++) {
+			vector<vector<int>> G1(n, vector<int>(n, 0));
+			vector<vector<int>> G2(n, vector<int>(n, 0));
+
+			for (int i = 0; i < n; i++) {
+				for (int j = i + 1; j < n; j++) {
+					int r = rand() % 2;
+					G1[i][j] = r;
+					G1[j][i] = r;
+				}
+			}
+			G2 = G1;
+			g2(n, G1, G2);
+			proverka(n, G1, G2);
+
+		}
+		sum = k;
+		k = 0;
+		cout << "Sum = " << sum / 10 << " for n = " << n << endl;
+		f << "Sum = " << sum / 10 << " for n = " << n << endl;
+	}
+}
