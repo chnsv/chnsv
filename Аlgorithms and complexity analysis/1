@@ -1,0 +1,33 @@
+#include <iostream>
+#include <fstream>
+using namespace std;
+
+int main()
+{
+	ofstream f("f.txt");
+	for (int n = 2; n <= 30; n += 2)
+	{
+		int k = 0;
+		int* v = new int[n];
+		int** m = new int* [n];
+		for (int i = 0; i < n; i++)
+		{
+			m[i] = new int[n];
+			for (int j = 0; j < n; j++)
+				m[i][j] = rand() % 10;
+		}
+		for (int i = 0; i < n; i++)
+			v[i] = rand() % 10;
+		for (int i = 0; i < n; i++)
+		{
+			int s = 0;
+			for (int j = 0; j < n; j++)
+			{
+				s += v[i] * m[i][j];
+				k += 3;
+			}
+		}
+		cout << "for " << n << " size = " << k << endl;
+		f << n << " " << k << endl;
+	}
+}
