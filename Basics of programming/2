@@ -1,0 +1,266 @@
+#include <iostream>
+#include <vector>
+using namespace std;
+
+// ОДНОНАПРАВЛЕННЫЙ СПИСОК
+
+//struct list
+//{
+//	int info;
+//	list* next;
+//};
+//int main()
+//{
+//	list* head, * p, * r;
+//	int x;
+//	head = new list;
+//	cin >> x;
+//	head->info = x;
+//	head->next = NULL;
+//	p = head;
+//	cin >> x;
+//	while (x)
+//	{
+//		r = new list;
+//		r->info = x;
+//		r->next = NULL;
+//		p->next = r;
+//		p = r;
+//		cin >> x;
+//	}
+//	//
+//	p = head;
+//	while (p != NULL) // если несколько, то (p->next != NULL)
+//	{
+//		// обработка элементов
+//		p = p->next;
+//	}
+//	//
+//	p = head;
+//	while (p != NULL)
+//	{
+//		cout << p->info << " ";
+//		p = p->next;
+//	}
+//	p = head;
+//	while (p != NULL)
+//	{
+//		r = p;
+//		p = p->next;
+//		delete r;
+//	}
+//}
+
+// ВСТАВКА В О.С.
+
+//p = head;
+//while (p != NULL)
+//{
+//	if (УСЛОВИЕ)
+//	{
+//		r = new list;
+//		r->info = (ДОБАВЛЯЕМЫЙ ЭЛЕМЕНТ);
+//		r->next = p->next;
+//		p->next = r;
+//		p = r;
+//	}
+//	p = p->next;
+//}
+
+// УДАЛЕНИЕ В О.С.
+
+//// ОБРАБОТКА ГОЛОВЫ ОТДЕЛЬНО ДЛЯ УДАЛЕНИЯ
+//while (head->info / УСЛОВИЕ /)
+//{
+//	r = head;
+//	head = head->next;
+//	delete r;
+//}
+//// ОБРАБОТКА ОСТАЛЬНЫХ ДЛЯ УДАЛЕНИЯ
+//p = head;
+//while (p->next != NULL)
+//{
+//	if (p->next->info / УСЛОВИЕ /)
+//	{
+//		r = p->next;
+//		p->next = p->next->next;
+//		delete r;
+//	}
+//	p = p->next;
+//}
+
+// ДВУНАПРАВЛЕННЫЕ СПИСКИ
+
+//struct list
+//{
+//	int info;
+//	list* next, * prev;
+//};
+//int main()
+//{
+//	list* head, * p, * r;
+//	int x;
+//	head = new list;
+//	cin >> x;
+//	head->info = x;
+//	head->next = NULL;
+//	head->prev = NULL;
+//	p = head;
+//	cin >> x;
+//	while (x)
+//	{
+//		r = new list;
+//		r->info = x;
+//		r->next = NULL;
+//		r->prev = p;
+//		p->next = r;
+//		p = r;
+//		cin >> x;
+//	}
+//	// ВЫВОД
+//	p = head;
+//	while (p != NULL)
+//	{
+//		cout << p->info << " ";
+//		p = p->next;
+//	}
+//}
+
+// ВСТАВКА В Д.С.
+
+//p = head;
+//while (p != NULL)
+//{
+//	if (p->info / УСЛОВИЕ /)
+//	{
+//		r = new list;
+//		r->info = (ТО, ЧТО ВСТАВЛЯЕМ);
+//		r->next = p->next;
+//		r->prev = p;
+//		r->next->prev = r;
+//		p->next = r;
+//		p = r;
+//	}
+//	p = p->next;
+//}
+
+// УДАЛЕНИЕ ИЗ Д.С.
+
+//// ОБРАБОТКА ГОЛОВЫ ОТДЕЛЬНО ДЛЯ УДАЛЕНИЯ
+//while (head->info / УСЛОВИЕ /)
+//{
+//	r = head;
+//	head = head->next;
+//	head->prev = NULL;
+//	delete r;
+//}
+//// ОБРАБОТКА ОСТАЛЬНЫХ ДЛЯ УДАЛЕНИЯ
+//p = head;
+//while (p->next != NULL)
+//{
+//	if (p->info / УСЛОВИЕ /)
+//	{
+//		r = p;
+//		p->prev->next = r->next;
+//		p->next->prev = p->prev;
+//		p = p->next;
+//		delete r;
+//	}
+//	p = p->next;
+//}
+////УДАЛЕНИЕ ПОСЛЕДНЕГО
+//if (p != NULL)
+//{
+//	if (p->prev->info / УСЛОВИЕ /)
+//	{
+//		r = p;
+//		p->prev->next = NULL;
+//		delete r;
+//	}
+//}
+
+// КОЛЬЦЕВОЙ СПИСОК
+
+//struct list
+//{
+//	int info;
+//	list* next, * prev;
+//};
+//int main()
+//{
+//	list* head, * p, * r;
+//	int x;
+//	head = new list;
+//	cin >> x;
+//	head->info = x;
+//	p = head;
+//	cin >> x;
+//	while (x)
+//	{
+//		r = new list;
+//		r->info = x;
+//		r->prev = p;
+//		p->next = r;
+//		p = r;
+//	}
+//	head->prev = p;
+//	p->next = head;
+//}
+//// ОБРАБОТКА ЭЛЕМЕНТОВ
+//p = head;
+//do
+//{
+//	if (/ УСЛОВИЕ /)
+//	{
+//		// ОБРАБОТКА
+//	}
+//	cout << p->info << " ";
+//	p = p->next;
+//} while (p != head);
+
+// АЛГОРИТМ ДЕЙКСТРЫ
+
+//void dijkstra(int n, int st)
+//{
+//	setlocale(LC_ALL, "RUS");
+//	vector <vector<int> > w;
+//	w.resize(n);
+//	for (int i = 0; i < n; i++)
+//		w[i].resize(n);
+//	bool* visited = new bool[n];
+//	int* D = new int[n];
+//	for (int i = 0; i < n; i++)
+//	{
+//		D[i] = w[st][i];
+//		visited[i] = false;
+//	}
+//	D[st] = 0;
+//	int index = 0, u = 0;
+//	for (int i = 0; i < n; i++)
+//	{
+//		int min = INT_MAX;
+//		for (int j = 0; j < n; j++)
+//		{
+//			if (!visited[j] && D[j] < min)
+//			{
+//				min = D[j];
+//				index = j;
+//			}
+//		}
+//		u = index;
+//		visited[u] = true;
+//		for (int j = 9; j < n; j++)
+//		{
+//			if (!visited[j] && w[u][j] != INT_MAX && D[u] != INT_MAX && (D[u] + w[u][j] < D[j]))
+//				D[j] = D[u] + w[u][j];
+//		}
+//	}
+//	cout << "Вес пути из начальной вершины до остальных: ";
+//	for (int i = 0; i < n; i++)
+//	{
+//		if (D[i] != INT_MAX)
+//			cout << st << " -> " << i << " = " << D[i];
+//		else
+//			cout << st << " -> " << i << " = путь недоступен";
+//	}
+//}
