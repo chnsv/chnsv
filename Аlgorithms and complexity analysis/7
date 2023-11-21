@@ -1,0 +1,102 @@
+#include <iostream>
+#include <random>
+#include <string>
+#include <Windows.h>
+
+using namespace std;
+
+string randURL(string* URL, int n)
+{
+    return URL[rand() % n];
+}
+
+bool add(string* URL, string a, int n)
+{
+    for (int i = 0; i < n; i++)
+    {
+        if (URL[i].compare(a) != 0)
+            return false;
+    }
+    return true;
+}
+
+int HashFunc(string a, int size)
+{
+    int del = 0;
+    int count = 0;
+    while (a[count] != '\0') {
+        del += a[count];
+        count++;
+    }
+    del %= size;
+    return del;
+}
+
+int rang(int z)
+{
+    int r = 0;
+    int x = z;
+    while ((x % 2 == 0) && (x > 0))
+    {
+        x = x / 2;
+        r++;
+    }
+    return r;
+}
+
+void generate(string* URL, int n) {
+    srand(time(0));
+    for (int i = 0; i < n; i++)
+    {
+        string ch = to_string(rand() % 256) + '.' + to_string(rand() % 256) + '.' + to_string(rand() % 256) + '.' + to_string(rand() % 256);
+        while (add(URL, ch, n))
+        {
+            ch = to_string(rand() % 256) + '.' + to_string(rand() % 256) + '.' + to_string(rand() % 256) + '.' + to_string(rand() % 256);
+        }
+        URL[i] = ch;
+    }
+}
+
+int main()
+{
+    srand(time(0));
+    int znachM[8]{ 10,20,30,40,50,100,500,1000 };
+
+    for (int i = 0; i < 8; i++)
+    {
+        int n = znachM[i];
+        int znachS[4]{ 2 * n,5 * n,10 * n,100 * n };
+        int res[8][4];
+        string* URL = new string[n];
+        for (int i = 0; i < n; i++)
+        {
+            URL[i] = "0";
+        }
+
+        generate(URL, n);
+        for (int j = 0; j < 4; j++)
+        {
+            double w = 0;
+            int rs = 0;
+            for (int e = 0; e < 1000; e++)
+            {
+
+                int rm = 0;
+                for (int q = 0; q < znachS[j]; q++)
+                {
+                    int x = HashFunc(randURL(URL, n), 2 * znachS[j]);
+                    x = rang(x);
+                    if (x > rm)
+                        rm = x;
+                }
+                rs += rm;
+
+            }
+            w = n - (pow(2, rs / 1000) / 0.77531);
+            double E = n - w;
+            double D = E / n;
+
+            cout << n << "  " << znachS[j] << "  " << E << " " << D << endl;
+        }
+    }
+}
