@@ -1,0 +1,229 @@
+#include <iostream>
+#include <fstream>
+#include <cstdlib>
+#include <ctime>
+using namespace std;
+int kol;
+
+struct laba5
+{
+	int dlina;
+	int* per;
+};
+
+laba5 add(laba5 x, laba5 y)
+{
+	laba5 q;
+	q.dlina = x.dlina + 1;
+	q.per = new int[q.dlina];
+
+	q.per[x.dlina - 1] = x.per[x.dlina - 1];
+	q.per[x.dlina] = 0;
+
+	for (int i = 0; i < y.dlina; ++i)
+	{
+		q.per[i] = x.per[i] + y.per[i];
+		kol += 2;
+	}
+
+	for (int i = 0; i < q.dlina - 1; ++i)
+		if (q.per[i] >= 10)
+		{
+			int c = q.per[i] / 10;
+			q.per[i + 1] += c;
+			q.per[i] -= c * 10;
+			kol += 9;
+		}
+		else
+			kol++;
+
+	return q;
+}
+
+laba5 sub(laba5 x, laba5 y)
+{
+	laba5 w;
+	w = x;
+
+	for (int i = 0; i < y.dlina; ++i)
+	{
+		w.per[i] -= y.per[i];
+		kol += 2;
+	}
+
+	for (int i = 0; i < w.dlina - 1; ++i)
+		if (w.per[i] < 0)
+		{
+			int d = (w.per[i] + 1) / 10 - 1;
+			w.per[i + 1] += d;
+			w.per[i] -= d * 10;
+			kol += 10;
+		}
+		else
+			kol++;
+	return w;
+}
+
+laba5 mult(laba5 x, laba5 y)
+{
+	laba5 otvet;
+	otvet.dlina = x.dlina + y.dlina;
+	otvet.per = new int[otvet.dlina];
+
+	if (x.dlina < 16)
+	{
+		for (int i = 0; i < otvet.dlina; i++)
+			otvet.per[i] = 0;
+		for (int i = 0; i < x.dlina; ++i)
+			for (int j = 0; j < y.dlina; ++j)
+			{
+				otvet.per[i + j] += x.per[i] * y.per[j];
+				kol += 3;
+			}
+	}
+	else
+	{
+
+		laba5 otvet1;
+		otvet1.per = y.per;
+		otvet1.dlina = (y.dlina + 1) / 2;
+		laba5 otvet2;
+		otvet2.per = x.per;
+		otvet2.dlina = (x.dlina + 1) / 2;
+
+		laba5 otvet12;
+		otvet12.per = y.per + otvet1.dlina;
+		otvet12.dlina = y.dlina / 2;
+		laba5 otvet21;
+		otvet21.per = x.per + otvet2.dlina;
+		otvet21.dlina = x.dlina / 2;
+
+		laba5 sumA = add(otvet2, otvet21);
+
+		laba5 sumB = add(otvet1, otvet12);
+
+		laba5 multsum = mult(sumA, sumB);
+		kol += 3;
+
+		laba5 multo2o1 = mult(otvet2, otvet1);
+		laba5 multo21o12 = mult(otvet21, otvet12);
+		laba5 sumall = sub(sub(multsum, multo2o1), multo21o12);
+		kol += 3;
+
+		for (int i = 0; i < multo2o1.dlina; ++i)
+			otvet.per[i] = multo2o1.per[i];
+
+		for (int i = multo2o1.dlina; i < multo2o1.dlina + multo21o12.dlina; ++i)
+			otvet.per[i] = multo21o12.per[i - multo2o1.dlina];
+
+		for (int i = 0; i < sumall.dlina; ++i)
+		{
+			otvet.per[otvet2.dlina + i] += sumall.per[i];
+			kol += 2;
+		}
+
+	}
+
+	for (int i = 0; i < otvet.dlina - 1; ++i)
+		if (otvet.per[i] >= 10)
+		{
+			int c = otvet.per[i] / 10;
+			otvet.per[i + 1] += c;
+			otvet.per[i] -= c * 10;
+			kol += 9;
+		}
+		else kol++;
+
+	return otvet;
+}
+
+laba5 sh(laba5 x)
+{
+	laba5 e;
+	e.dlina = x.dlina + 1;
+	e.per = new int[e.dlina];
+
+	e.per[0] = 0;
+	for (int i = 0; i < x.dlina; ++i)
+	{
+		e.per[i + 1] = x.per[i];
+		kol += 2;
+	}
+
+	return e;
+}
+
+void print(laba5 x)
+{
+	for (int i = 0; i < x.dlina; i++)
+		cout << x.per[i] << " ";
+	cout << endl;
+}
+
+
+int main()
+{
+	laba5 x, y, z;
+
+	x.dlina = 4;
+	x.per = new int[x.dlina];
+
+	y.dlina = 4;
+	y.per = new int[y.dlina];
+
+	x.per[0] = 5;
+	x.per[1] = 6;
+	x.per[2] = 7;
+	x.per[3] = 8;
+
+	y.per[0] = 1;
+	y.per[1] = 2;
+	y.per[2] = 3;
+	y.per[3] = 4;
+
+	z = add(x, y);
+	cout << "x = " << x.per[3] << x.per[2] << x.per[1] << x.per[0] << endl;
+	cout << "y = " << y.per[3] << y.per[2] << y.per[1] << y.per[0] << endl;
+	cout << "x + y = ";
+	for (int i = z.dlina - 1; i >= 0; --i)
+		cout << z.per[i];
+	cout << endl;
+	cout << "x = " << x.per[3] << x.per[2] << x.per[1] << x.per[0] << endl;
+	cout << "Sdvig x = ";
+	z = sh(x);
+	for (int i = z.dlina - 1; i >= 0; --i)
+		cout << z.per[i];
+	cout << endl;
+	z = sub(x, y);
+	cout << "x - y = ";
+	for (int i = z.dlina - 1; i >= 0; --i)
+		cout << z.per[i];
+	cout << endl;
+
+	ofstream file("f.txt", ios::app);
+	srand(time(0));
+
+	for (int n = 128; n <= 16384; n *= 2)
+	{
+		kol = 0;
+		laba5 x;
+		x.per = new int[n];
+		x.dlina = n;
+		for (int i = 0; i < n - 1; i++)
+			x.per[i] = rand() % 20;
+		x.per[n - 1] = rand() % 15 + 1;
+
+		laba5 y;
+		y.per = new int[n];
+		y.dlina = n;
+		for (int i = 0; i < n - 1; i++)
+			y.per[i] = rand() % 10;
+		y.per[n - 1] = rand() % 9 + 1;
+		mult(x, y);
+
+		file << n << " " << kol << "\n";
+	}
+
+	system("pause");
+	return 0;
+}
