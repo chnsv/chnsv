@@ -1,0 +1,169 @@
+#include <iostream>
+#include<ctime>
+using namespace std;
+
+class findJ
+{
+public:
+	int n;
+	long long k_sredn;
+	int** Picture;
+	int* complexity = new int[10];
+
+	void emptyPic()
+	{
+		for (int i = 0; i < n; i++)
+		{
+			Picture[i] = new int[n];
+			for (int j = 0; j < n; j++)
+			{
+				Picture[i][j] = 0;
+			}
+		}
+	}
+
+	bool willIntersect(int pos_x, int pos_y, int size)
+	{
+		int min_size = 3;
+		int vertic_size = min_size + size;
+		int horiz_size = (int)vertic_size / 2;
+
+		if (pos_x - 1 - horiz_size < 0 || pos_y + vertic_size + 1> n) return true;
+		for (int i = 0; i < vertic_size; i++)
+		{
+			if (Picture[pos_y + i][pos_x] == 1) return true;
+		}
+		for (int i = 0; i < horiz_size; i++)
+		{
+			if (Picture[pos_y + vertic_size][pos_x - 1 - i] == 1) return true;
+		}
+		return false;
+	}
+
+	void draw(int pos_x, int pos_y, int size)
+	{
+		int min_size = 3;
+		int vertic_size = min_size + size;
+		int horiz_size = (int)vertic_size / 2;
+
+		if (willIntersect(pos_x, pos_y, size)) return;
+
+		for (int i = 0; i < vertic_size; i++)
+		{
+			Picture[pos_y + i][pos_x] = 1;
+		}
+		for (int i = 0; i < horiz_size; i++)
+		{
+			Picture[pos_y + vertic_size][pos_x - 1 - i] = 1;
+		}
+	}
+
+	int findPic(int max_size)
+	{
+		int count = 0;
+		int pictureFound = 0;
+
+		for (int curr_size = 0; curr_size <= max_size; curr_size++)
+		{
+			int min_size = 3;
+			int vertic_size = min_size + curr_size;
+			int horiz_size = (int)vertic_size / 2;
+			for (int i = 0; i < n; i++)
+			{
+				for (int j = 0; j < n; j++)
+				{
+					if (Picture[i][j] == 1)
+					{
+						for (int i1 = 0; i1 < vertic_size; i1++)
+						{
+							if (Picture[i + i1][j] == 0)
+							{
+								count += 2;
+								break;
+							}
+							count += 2;
+						}
+						for (int i1 = 0; i1 < horiz_size; i1++)
+						{
+							if (Picture[i + vertic_size][j - 1 - i1] == 0)
+							{
+								count += 4;
+								break;
+							}
+							count += 4;
+						}
+						pictureFound++;
+						printf("Координаты прямоугольника, описывающего картинку:\n Левый верхний угол x = %d, y = %d\n Правый нижний угол x = %d, y = %d \n", j, i, j + horiz_size, i + vertic_size);
+					}
+					count += 1;
+					if (pictureFound == 2) return count;
+				}
+			}
+		}
+		cout << "Картинок не обнаружено" << endl;
+		return count;
+	}
+
+	//return k;
+	void showPic()
+	{
+		for (int i = 0; i < n; i++)
+		{
+			for (int j = 0; j < n; j++)
+			{
+				cout << Picture[i][j] << " ";
+			}
+			cout << endl;
+		}
+	}
+
+	void printMas(int* a, int n)
+	{
+		for (int i = 0; i < n; i++) 
+			cout << a[i] << endl;
+		cout << endl;
+	}
+
+	void solution()
+	{
+		srand(time(NULL));
+		for (int pic_size = 100, masi = 0; pic_size <= 1000; pic_size += 100, masi++)
+		{
+			long long int k = 0;
+			for (int rtest = 0; rtest <= 1000; rtest++)
+			{
+				n = pic_size;
+				Picture = new int* [n];
+				emptyPic();
+				int pic_num = 0;
+
+				while (pic_num != 2)
+				{
+					int posit_y = rand() % n;
+					int posit_x = rand() % n;
+					int size = rand() % (int)n / 4;
+					if (!willIntersect(posit_y, posit_x, size))
+					{
+						//cout << posit_y << " " << posit_x << " " << size << endl;
+						draw(posit_y, posit_x, size);
+						pic_num++;
+					}
+				}
+				k += findPic((int)n / 4);
+				showPic();
+				int stop; cin >> stop;
+			}
+			k /= 1000;
+			complexity[masi] = (int)k;
+
+		}
+		printMas(complexity, 10);
+	}
+};
+int main()
+{
+	setlocale(LC_ALL, "ru");
+
+	findJ findj;
+	findj.solution();
+}
