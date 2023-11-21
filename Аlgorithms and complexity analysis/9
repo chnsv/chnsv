@@ -1,0 +1,54 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+bool ShemaGornera(const string& elem, int& i)
+{
+    if (elem[i] == 'x')
+    {
+        i++;
+        if (elem[i] == '(')
+        {
+            i++;
+            if (ShemaGornera(elem, i))
+            {
+                if (elem[i] == ')')
+                    i++;
+                else return false;
+            }
+            else return false;
+        }
+    }
+    else
+    {
+        while (i < elem.length() && (elem[i] == '-' || elem[i] == '+'))
+            i++;
+        while (i < elem.length() && isdigit(elem[i]))
+            i++;
+        if (i < elem.length() && elem[i] == '.')
+        {
+            i++;
+            while (i < elem.length() && isdigit(elem[i]))
+                i++;
+        }
+    }
+    return true;
+}
+
+bool ShemaGornera(const string& elem)
+{
+    int i = 0;
+    return ShemaGornera(elem, i) && i == elem.length();
+}
+
+int main()
+{
+    string elem;
+    cout << "Enter scheme Gorner's: ";
+    cin >> elem;
+    if (ShemaGornera(elem))
+        cout << "Scheme Gorner!" << endl;
+    else
+        cout << "Not a scheme Gorner!" << endl;
+    return 0;
+}
