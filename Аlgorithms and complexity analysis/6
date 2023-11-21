@@ -1,0 +1,202 @@
+#include <iostream>
+#include <ctime>
+#include <string>
+using namespace std;
+int N = 2000;
+
+int HashFunc(char* mass, int n) {
+
+	int k = 0, i = 0;
+	while (i < n) {
+		k += mass[i];
+		i++;
+	}
+	k %= N;
+	return k;
+}
+
+char* genaration(int n)
+{
+	char* mass = new char[n];
+	for (int i = 0; i < n; i++)
+		mass[i] = rand() % 100 + 37;
+	return mass;
+}
+
+bool povtor(int mass[], int e)
+{
+	for (int i = 0; i < 2000; i++)
+	{
+		if (mass[i] == e)
+			return true;
+	}
+	return false;
+}
+
+int main()
+{
+	// Линейное рехеширование
+	for (double alf = 0.05; alf < 1; alf += 0.05)
+	{
+		int kolizii = 0;
+		for (int expir = 0; expir < 1000; expir++)
+		{
+			int arr[2000];
+			for (int i = 0; i < N; i++)
+				arr[i] = 0;
+			for (int sizeHash = 0; sizeHash < alf * 2000; sizeHash++)
+			{
+				int n = rand() % 16 + 5;
+				char* mas = genaration(n);
+				if (arr[HashFunc(mas, n)] == 0)
+					arr[HashFunc(mas, n)]++;
+				else
+				{
+					int index = HashFunc(mas, n);
+					while ((arr[index] != 0) && (index < N))
+					{
+						index++;
+					}
+					if ((arr[index] == 0) && (index < N))
+					{
+						arr[index]++;
+					}
+					else
+					{
+						index = 0;
+						while ((arr[index] != 0) && (index < N))
+						{
+							index++;
+						}
+						arr[index]++;
+					}
+				}
+			}
+			int n = rand() % 16 + 5;
+			char* obj = genaration(n);
+			if (arr[HashFunc(obj, n)] == 0)
+				arr[HashFunc(obj, n)]++;
+			else
+			{
+				kolizii++;
+				int index = HashFunc(obj, n);
+				while ((arr[index] != 0) && (index < N))
+				{
+					index++;
+					kolizii++;
+				}
+				if ((arr[index] == 0) && (index < N))
+					arr[index]++;
+				else
+				{
+					index = 0;
+					while ((arr[index] != 0) && (index < N))
+					{
+						index++;
+						kolizii++;
+					}
+					arr[index]++;
+				}
+			}
+		}
+		cout << alf << " " << kolizii / 1000 << endl;
+	}
+	cout << endl;
+
+	// Случайное рехеширование
+	for (double alf = 0.05; alf < 1; alf += 0.05)
+	{
+		int rHash[2000];
+		for (int sizeHash = 0; sizeHash < 2000; sizeHash++)
+		{
+			rHash[sizeHash] = -9999;
+		}
+		for (int sizeHash = 0; sizeHash < 2000; sizeHash++)
+		{
+			int t = rand() % N;
+			while (povtor(rHash, t))
+			{
+				t = rand() % N;
+			}
+			rHash[sizeHash] = t;
+		}
+		int kolizi = 0;
+		for (int expir = 0; expir < 1000; expir++)
+		{
+			int arr[2000];
+			for (int i = 0; i < N; i++)
+				arr[i] = 0;
+			int k = 0;
+			for (int sizeHash = 0; sizeHash < alf * 2000; sizeHash++)
+			{
+				int n = rand() % 16 + 5;
+				char* mas = genaration(n);
+				if (arr[HashFunc(mas, n)] == 0)
+					arr[HashFunc(mas, n)]++;
+				else
+				{
+					if (arr[HashFunc(mas, n)] != 0)
+					{
+						int key = (HashFunc(mas, n) + rHash[k]) % N;
+						k++;
+						while (arr[key] != 0 && k < N)
+						{
+							key = (HashFunc(mas, n) + rHash[k]) % N;
+							k++;
+						}
+						if (k == N)
+						{
+
+							k = 0;
+							while (arr[key] != 0 && k < N)
+							{
+								key = (HashFunc(mas, n) + rHash[k]) % N;
+								k++;
+							}
+
+						}
+						arr[key]++;
+						arr[(HashFunc(mas, n))] = key;
+					}
+
+				}
+
+			}
+			int n = rand() % 16 + 5;
+			char* obj = genaration(n);
+			if (arr[HashFunc(obj, n)] == 0)
+				arr[HashFunc(obj, n)]++;
+			else
+			{
+				if (arr[HashFunc(obj, n)] != 0)
+				{
+					kolizi++;
+					int key = (HashFunc(obj, n) + rHash[k]) % N;
+					k++;
+					while (arr[key] != 0 && k < N)
+					{
+						kolizi++;
+						key = (HashFunc(obj, n) + rHash[k]) % N;
+						k++;
+					}
+					if (k == N)
+					{
+						k = 0;
+						while (arr[key] != 0 && k < N)
+						{
+							kolizi++;
+							key = (HashFunc(obj, n) + rHash[k]) % N;
+							k++;
+						}
+					}
+					arr[key]++;
+					arr[(HashFunc(obj, n))] = key;
+				}
+			}
+		}
+		cout << alf << " " << kolizi / 1000 << endl;
+	}
+
+	system("pause");
+	return 0;
+}
