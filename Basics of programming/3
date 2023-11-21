@@ -1,0 +1,1010 @@
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+struct tree
+{
+	int info;
+	tree* left, * right;
+};
+
+void add_node(tree* root, int data)
+{
+	if (data < root->info)
+	{
+		if (root->left == NULL)
+		{
+			tree* r;
+			r = new tree;
+			r->info = data;
+			r->left = NULL;
+			r->right = NULL;
+			root->left = r;
+		}
+		else add_node(root->left, data);
+	}
+	else
+	{
+		if (root->right == NULL)
+		{
+			tree* r;
+			r = new tree;
+			r->info = data;
+			r->left = NULL;
+			r->right = NULL;
+			root->right = r;
+		}
+		else add_node(root->right, data);
+	}
+}
+
+void print_LNR(tree* root)
+{
+	if (root != NULL)
+	{
+		print_LNR(root->left);
+		cout << root->info << " ";
+		print_LNR(root->right);
+	}
+}
+
+// FILES
+
+//1.1
+// Дан файл. Если сумма его элементов, расположенных на нечетных позициях, меньше А,
+// то записать в новый файл все элементы, в записи которых встретилось число б,
+// иначе все положительные в другой.
+
+//int f(int a, int q)
+//{
+//	while (a)
+//	{
+//		if (a % 10 == q) return 1;
+//		a /= 10;
+//	}
+//	return 0;
+//}
+//
+//int main()
+//{
+//	ifstream a("a.txt");
+//	ofstream b("b.txt");
+//	ofstream c("c.txt");
+//	if (!a)
+//	{
+//		cout << "can't open";
+//		exit(1);
+//	}
+//	int s = 0, pos = 1, x, A, q;
+//	cout << "A = "; cin >> A;
+//	cout << "b = "; cin >> q;
+//	while (!a.eof() && a >> x)
+//	{
+//		if (pos % 2 != 0)
+//			s += x;
+//		pos++;
+//	}
+//	cout << "s = " << s << endl;
+//	a.seekg(0);
+//	if (s < A)
+//	{
+//		while (!a.eof() && a >> x)
+//		{
+//			if (f(x, q) == 1)
+//			{
+//				b << x << " ";
+//				cout << x << " " << endl;
+//			}
+//		}
+//	}
+//	else
+//	{
+//		while (!a.eof() && a >> x)
+//		{
+//			if (x > 0)
+//			{
+//				c << x << " ";
+//				cout << x << " " << endl;
+//			}
+//		}
+//	}
+//}
+
+//1.2
+// Дан файл. Если кол-во его элементов, расположенных на нечетных позициях больше 5,
+// то записать в новый файл все элементы, у которых есть хотя бы 3 четных делителя, 
+// иначе все положительные в другой.
+
+//int chet(int a)
+//{
+//	int k = 0;
+//	for (int i = 2; i <= a; i += 2)
+//		if (a % i == 0) k++;
+//	if (k >= 3) return 1;
+//	return 0;
+//}
+//
+//int main()
+//{
+//	ifstream a("a.txt");
+//	ofstream b("b.txt");
+//	ofstream c("c.txt");
+//	if (!a)
+//	{
+//		cout << "no";
+//		exit(1);
+//	}
+//	int k = 0, x, pos = 1;
+//	while (!a.eof() && a >> x)
+//	{
+//		if (pos % 2 != 0) k++;
+//		pos++;
+//	}
+//	cout << "k = " << k << endl;
+//	a.seekg(0);
+//	if (k > 5)
+//	{
+//		while (!a.eof() && a >> x)
+//		{
+//			if (chet(x) == 1)
+//			{
+//				b << x << " ";
+//				cout << x << " ";
+//			}
+//		}
+//	}
+//	else
+//	{
+//		while (!a.eof() && a >> x)
+//		{
+//			if (x > 0)
+//			{
+//				c << x << " ";
+//				cout << x << " ";
+//			}
+//		}
+//	}
+//}
+
+//2.1
+// Дан файл. Если ср. арифм. его элементов больше А, то записать в новый файл все 
+// элементы, кол-во цифр которых четно, иначе все оканчивающиеся 9 - в другой.
+
+//int f(int a)
+//{
+//	int k = 0;
+//	while (a)
+//	{
+//		a /= 10; 
+//		k++;
+//	}
+//	if (k % 2 == 0) return 1;
+//	return 0;
+//}
+//
+//int main()
+//{
+//	ifstream a("a.txt");
+//	ofstream b("b.txt");
+//	ofstream c("c.txt");
+//	if (!a)
+//	{
+//		cout << "no";
+//		exit(1);
+//	}
+//	int x, A, s = 0, k = 0, sr = 0;
+//	cout << "A = "; cin >> A;
+//	while (!a.eof() && a >> x)
+//	{
+//		k++; s += x;
+//	}
+//	sr = s / k;
+//	cout << "sr = " << sr << endl;
+//	a.close();
+//	a.open("a.txt");
+//	if (sr > A)
+//	{
+//		while (!a.eof() && a >> x)
+//		{
+//			if (f(x) == 1)
+//			{
+//				b << x << " ";
+//				cout << x << " ";
+//			}
+//		}
+//	}
+//	else
+//	{
+//		while (!a.eof() && a >> x)
+//		{
+//			if (x % 10 == 9)
+//			{
+//				c << x << " ";
+//				cout << x << " ";
+//			}
+//		}
+//	}
+//}
+
+//2.2
+// Дан файл. Если кол-во элементов, расположенных на нечетных позициях - четное, 
+// то записать в новый файл все элементы, сумма цифр которых больше А, иначе все
+// отрицательные в другой.
+
+//int f(int a)
+//{
+//	int s = 0;
+//	while (a)
+//	{
+//		s += a % 10;
+//		a /= 10;
+//	}
+//	return s;
+//}
+//
+//int main()
+//{
+//	ifstream a("a.txt");
+//	ofstream b("b.txt");
+//	ofstream c("c.txt");
+//	if (!a)
+//	{
+//		cout << "no";
+//		exit(1);
+//	}
+//	int k = 0, x, pos = 1, A;
+//	cout << "A = "; cin >> A;
+//	while (!a.eof() && a >> x)
+//	{
+//		if (pos % 2 != 0) k++;
+//		pos++;
+//	}
+//	cout << "k = " << k << endl;
+//	a.seekg(0);
+//	if (k % 2 == 0)
+//	{
+//		while(!a.eof() && a >> x)
+//		{
+//			if (f(x) > A)
+//			{
+//				b << x << " ";
+//				cout << x << " ";
+//			}
+//		}
+//	}
+//	else
+//	{
+//		while (!a.eof() && a >> x)
+//		{
+//			if (x < 0)
+//			{
+//				c << x << " ";
+//				cout << x << " ";
+//			}
+//		}
+//	}
+//}
+
+// VECTOR
+
+//1.1
+// Дан вектор. Вставить после простых элементов, минимальный элемент вектора,
+// Вывести получившийся вектор в обратном порядке.
+
+//int prost(int a)
+//{
+//	if (a == 1) return 0;
+//	for (int i = 2; i < a; i++)
+//		if (a % i == 0) return 0;
+//	return 1;
+//}
+//
+//int main()
+//{
+//	int x, min;
+//	vector <int> v;
+//	cin >> x;
+//	while (x != 0)
+//	{
+//		v.push_back(x);
+//		cin >> x;
+//	}
+//	auto it = minmax_element(v.begin(), v.end());
+//	min = *it.first;
+//	cout << "min = " << min << endl;
+//	for (vector <int>::iterator it = v.begin(); it != v.end(); ++it)
+//	{
+//		if (prost(*it) == 1)
+//			it = v.insert(it + 1, min);
+//	}
+//	for (vector <int>::reverse_iterator it = v.rbegin(); it != v.rend(); ++it)
+//	{
+//		cout << *it << " ";
+//	}
+//}
+
+//1.2
+// Дан вектор. Вставить после совершенных элементов, максимальный элемент вектора,
+// Вывести получившийся вектор в обратном порядке.
+
+//int sov(int a)
+//{
+//	int s = 0;
+//	for (int i = 1; i < a; i++)
+//	{
+//		if (a % i == 0) s += i;
+//	}
+//	if (s == a) return 1;
+//	return 0;
+//}
+//
+//int main()
+//{
+//	int x, max;
+//	vector <int> v;
+//	cin >> x;
+//	while (x != 0)
+//	{
+//		v.push_back(x);
+//		cin >> x;
+//	}
+//	auto it = minmax_element(v.begin(), v.end());
+//	max = *it.second;
+//	cout << "max = " << max << endl;
+//	for (vector <int>::iterator it = v.begin(); it != v.end(); ++it)
+//	{
+//		if (sov(*it) == 1)
+//			it = v.insert(it + 1, max);
+//	}
+//	for (vector <int>::reverse_iterator it = v.rbegin(); it != v.rend(); ++it)
+//	{
+//		cout << *it << " ";
+//	}
+//}
+
+//2.1
+// Дан вектор. Удалить из него все простые элементы, расположенные на кратной 2
+// позиции. Вывести получившийся вектор в обратном порядке.
+
+//int prost(int a)
+//{
+//	if (a == 1) return 0;
+//	for (int i = 2; i < a; i++)
+//		if (a % i == 0) return 0;
+//	return 1;
+//}
+//
+//int main()
+//{
+//	int x, pos = 1;
+//	vector <int> v;
+//	cin >> x;
+//	while (x != 0)
+//	{
+//		v.push_back(x);
+//		cin >> x;
+//	}
+//	for (vector <int>::iterator it = v.begin(); it != v.end(); ++it)
+//	{
+//		if (prost(*it) == 1 && pos % 2 == 0)
+//		{
+//			it = v.erase(it);
+//			it--;
+//		}
+//		pos++;
+//	}
+//	for (vector <int>::reverse_iterator it = v.rbegin(); it != v.rend(); ++it)
+//	{
+//		cout << *it << " ";
+//	}
+//}
+
+//2.2
+// Дан вектор. Удалить из него все элементы, в записи которых встречается 6,
+// расположенные на кратной 2 позиции. Вывести получившийся вектор в обратном порядке.
+
+//int f(int a)
+//{
+//	while (a)
+//	{
+//		if (a % 10 == 6) return 1;
+//		a /= 10;
+//	}
+//	return 0;
+//}
+//
+//int main()
+//{
+//	int x, pos = 1;
+//	vector <int> v;
+//	cin >> x;
+//	while (x != 0)
+//	{
+//		v.push_back(x);
+//		cin >> x;
+//	}
+//	for (vector <int>::iterator it = v.begin(); it != v.end(); ++it)
+//	{
+//		if (f(*it) == 1 && pos % 2 == 0)
+//		{
+//			it = v.erase(it);
+//			it--;
+//		}
+//		pos++;
+//	}
+//	for (vector <int>::reverse_iterator it = v.rbegin(); it != v.rend(); ++it)
+//	{
+//		cout << *it << " ";
+//	}
+//}
+
+// TREE
+
+//1.1
+// 2 задание
+// Если сумма элементов на заданном уровне четная, то уменьшить двузначные нечетные
+// в 2 раза, иначе - заменить элементы, принадлежащие диапазону [a,b], на кол-во 
+// кратных 5 элементов дерева.
+
+//struct tree
+//{
+//	int info;
+//	int level;
+//	tree* left, * right;
+//};
+//
+//void add_node(tree* root, int data)
+//{
+//	if (data < root->info)
+//	{
+//		if (root->left == NULL)
+//		{
+//			tree* r;
+//			r = new tree;
+//			r->info = data;
+//			r->level = root->level + 1;
+//			r->left = NULL;
+//			r->right = NULL;
+//			root->left = r;
+//		}
+//		else add_node(root->left, data);
+//	}
+//	else
+//	{
+//		if (root->right == NULL)
+//		{
+//			tree* r;
+//			r = new tree;
+//			r->info = data;
+//			r->level = root->level + 1;
+//			r->left = NULL;
+//			r->right = NULL;
+//			root->right = r;
+//		}
+//		else add_node(root->right, data);
+//	}
+//}
+//
+//void print_LNR(tree* root)
+//{
+//	if (root != NULL)
+//	{
+//		print_LNR(root->left);
+//		cout << root->info << " ";
+//		print_LNR(root->right);
+//	}
+//}
+//
+//int sum_by_lvl(tree* root, int level)
+//{
+//	if (root == NULL) return -INFINITY;
+//	if (root->level == level) return root->info;
+//	return sum_by_lvl(root->left, level) + sum_by_lvl(root->right, level);
+//}
+//
+//void umen(tree* t)
+//{
+//	if (t != NULL)
+//	{
+//		if (t->info % 2 != 0 && abs(t->info) > 9 && abs(t->info) < 100)
+//			t->info /= 2;
+//		umen(t->right);
+//		umen(t->left);
+//	}
+//}
+//
+//int kol(tree* t)
+//{
+//	int kl = 0;
+//	if (t == NULL) return 0;
+//	if (t->info % 5 == 0) return 1 + kol(t->left);
+//	return kol(t->left) + kol(t->right);
+//}
+//
+//void zam(tree* t, int& k, int a, int b)
+//{
+//	if (t != NULL)
+//	{
+//		if (t->info >= a && t->info <= b)
+//			t->info = k;
+//		zam(t->left, k, a, b);
+//		zam(t->right, k, a, b);
+//	}
+//}
+//
+//
+//int main()
+//{
+//	int x, l, f = 0, a, b, k = 0;
+//	tree* root = new tree;
+//	cin >> x;
+//	root->info = x;
+//	root->left = NULL;
+//	root->right = NULL;
+//	root->level = 0;
+//	for (cin >> x; x != 0; cin >> x)
+//		add_node(root, x);
+//	cout << "enter a: "; cin >> a;
+//	cout << "enter b: "; cin >> b;
+//	cout << "enter level: "; cin >> l;
+//	cout << "sum by lvl = " << sum_by_lvl(root, l) << endl;
+//	k = kol(root);
+//	cout << "kolvo krat = " << k << endl;
+//	if (sum_by_lvl(root, l) % 2 == 0) f = 1;
+//	if (f == 1) umen(root);
+//	else zam(root, k, a, b);
+//	print_LNR(root);
+//}
+
+// 3 задание
+// Если в дереве все листья - положительные, то найти кол-во двузначных элементов, у
+// которых есть только 1 сын, иначе найти произведение нечетных.
+
+//bool pol(tree* t)
+//{
+//	if (t == NULL) return 0;
+//	if (t->left == NULL && t->right == NULL && t->info > 0) return 1;
+//	return pol(t->left) + pol(t->right);
+//}
+//
+//int kl(tree* t)
+//{
+//	if (t == NULL) return 0;
+//	if (((t->right != NULL && t->left == NULL) || (t->right == NULL && t->left != NULL)) && t->info > 9 && t->info < 100)
+//		return 1 + kl(t->right) + kl(t->left);
+//	return kl(t->right) + kl(t->left);
+//}
+//
+//int pr(tree* t)
+//{
+//	if (t == NULL) return 0;
+//	if (t->right == NULL && t->left == NULL && t->info % 2 != 0)
+//		return t->info * pr(t->left) * pr(t->right);
+//	return pr(t->left) * pr(t->right);
+//}
+//
+//int main()
+//{
+//	int x;
+//	tree* root = new tree;
+//	cin >> x;
+//	root->info = x;
+//	root->left = NULL;
+//	root->right = NULL;
+//	for (cin >> x; x != 0; cin >> x)
+//		add_node(root, x);
+//	if (pol(root))
+//	{
+//		int k = kl(root);
+//		cout << k << endl;
+//	}
+//	else
+//	{
+//		int proizv = pr(root);
+//		cout << proizv << endl;
+//	}
+//}
+
+//1.2
+// 2 задание
+// Если произведение элементов на заданном уровне кратно 3, то увеличить двузначные
+// нечетные элементы в 2 раза, иначе - заменить элементы из диапазона, обозначенного 
+// пользователем, на кол-во отрицательных.
+
+//struct tree
+//{
+//	int info;
+//	int level;
+//	tree* left, * right;
+//};
+//
+//void add_node(tree* root, int data)
+//{
+//	if (data < root->info)
+//	{
+//		if (root->left == NULL)
+//		{
+//			tree* r;
+//			r = new tree;
+//			r->info = data;
+//			r->level = root->level + 1;
+//			r->left = NULL;
+//			r->right = NULL;
+//			root->left = r;
+//		}
+//		else add_node(root->left, data);
+//	}
+//	else
+//	{
+//		if (root->right == NULL)
+//		{
+//			tree* r;
+//			r = new tree;
+//			r->info = data;
+//			r->level = root->level + 1;
+//			r->left = NULL;
+//			r->right = NULL;
+//			root->right = r;
+//		}
+//		else add_node(root->right, data);
+//	}
+//}
+//
+//void print_LNR(tree* root)
+//{
+//	if (root != NULL)
+//	{
+//		print_LNR(root->left);
+//		cout << root->info << " ";
+//		print_LNR(root->right);
+//	}
+//}
+//
+//int pr_by_lvl(tree* root, int level)
+//{
+//	if (root == NULL) return -INFINITY;
+//	if (root->level == level) return root->info;
+//	return pr_by_lvl(root->left, level) * pr_by_lvl(root->right, level);
+//}
+//
+//void uvel(tree* t)
+//{
+//	if (t != NULL)
+//	{
+//		if (t->info % 2 != 0 && abs(t->info) > 9 && abs(t->info) < 100)
+//			t->info *= 2;
+//		uvel(t->right);
+//		uvel(t->left);
+//	}
+//}
+//
+//int kol(tree* t)
+//{
+//	int kl = 0;
+//	if (t == NULL) return 0;
+//	if (t->info < 0) return 1 + kol(t->left);
+//	return kol(t->left) + kol(t->right);
+//}
+//
+//void zam(tree* t, int& k, int a, int b)
+//{
+//	if (t != NULL)
+//	{
+//		if (t->info >= a && t->info <= b)
+//			t->info = k;
+//		zam(t->left, k, a, b);
+//		zam(t->right, k, a, b);
+//	}
+//}
+//
+//int main()
+//{
+//	int x, l, f = 0, a, b, k = 0;
+//	tree* root = new tree;
+//	cin >> x;
+//	root->info = x;
+//	root->left = NULL;
+//	root->right = NULL;
+//	root->level = 0;
+//	for (cin >> x; x != 0; cin >> x)
+//		add_node(root, x);
+//	cout << "enter a: "; cin >> a;
+//	cout << "enter b: "; cin >> b;
+//	cout << "enter level: "; cin >> l;
+//	cout << "pr by lvl = " << pr_by_lvl(root, l) << endl;
+//	k = kol(root);
+//	cout << "kolvo otrit = " << k << endl;
+//	if (pr_by_lvl(root, l) % 3 == 0) f = 1;
+//	if (f == 1) uvel(root);
+//	else zam(root, k, a, b);
+//	print_LNR(root);
+//}
+
+// 3 задание
+//Если в дереве все листья - четные, то найти сумму двузначных элементов, у которых 
+// есть только 1 сын, иначе найти произведение нечетных.
+
+//bool chet(tree* t)
+//{
+//	if (t != NULL)
+//	{
+//		if (t->left == NULL && t->right == NULL && t->info % 2 != 0) return 0;
+//		return chet(t->left) && chet(t->right);
+//	}
+//	return 1;
+//}
+//
+//int sum(tree* t)
+//{
+//	if (t == NULL) return 0;
+//	if (((t->right != NULL && t->left == NULL) || (t->right == NULL && t->left != NULL)) && t->info > 9 && t->info < 100)
+//		return t->info + sum(t->right) + sum(t->left);
+//	return sum(t->right) + sum(t->left);
+//}
+//
+//int pr(tree* t)
+//{
+//	if (t == NULL) return 0;
+//	if (t->right == NULL && t->left == NULL && t->info % 2 != 0)
+//		return t->info * pr(t->left) * pr(t->right);
+//	return pr(t->left) * pr(t->right);
+//}
+//
+//int main()
+//{
+//	int x;
+//	tree* root = new tree;
+//	cin >> x;
+//	root->info = x;
+//	root->left = NULL;
+//	root->right = NULL;
+//	for (cin >> x; x != 0; cin >> x)
+//		add_node(root, x);
+//	if (chet(root))
+//	{
+//		int s = sum(root);
+//		cout << s << endl;
+//	}
+//	else
+//	{
+//		int proiz = pr(root);
+//		cout << proiz << endl;
+//	}
+//}
+
+//2.1
+// 2 задание
+// Если глубина дерева - больше Х, то увеличить все НЕ листья на значение максимального
+// элемента, иначе - заменить положительные на введенное пользователем число.
+
+//bool glub(tree* t, int current_level, int x)
+//{  
+//	if (t != NULL)
+//	{
+//		current_level++;
+//		return (current_level > x) || glub(t->left, current_level, x) || glub(t->right, current_level, x);
+//	}
+//	return false;
+//}
+//
+//int maxi(tree* t)
+//{
+//	if (t->right != NULL)
+//		return maxi(t->right);
+//	return t->info;
+//}
+//
+//void uvel(tree* t, int a)
+//{
+//	if (t != NULL)
+//	{
+//		if (t->left != NULL || t->right != NULL)
+//			t->info += a;
+//		uvel(t->left, a);
+//		uvel(t->right, a);
+//	}
+//}
+//
+//void zam(tree* t, int a)
+//{
+//	if (t != NULL)
+//	{
+//		if (t->info > 0)
+//			t->info = a;
+//		zam(t->left, a);
+//		zam(t->right, a);
+//	}
+//}
+//
+//int main()
+//{
+//	tree* root = new tree;
+//	int x, X, a;
+//	cout << "enter X = "; cin >> X;
+//	cout << "enter a = "; cin >> a;
+//	cin >> x;
+//	root->info = x;
+//	root->left = NULL;
+//	root->right = NULL;
+//	for (cin >> x; x != 0; cin >> x)
+//		add_node(root, x);
+//	if (glub(root, 0, X))
+//	{
+//		uvel(root, maxi(root));
+//	}
+//	else
+//	{
+//		zam(root, a);
+//	}
+//	print_LNR(root);
+//}
+
+// 3 задание
+// Если в дереве есть хотя бы один четный лист, то посчитать кол-во вершин, у которых есть
+// ровно 2 сына, иначе - найти произведение отрицательных листьев.
+
+//bool chet(tree* t)
+//{
+//	if (t != NULL)
+//	{
+//		if (t->left == NULL && t->right == NULL && t->info % 2 != 0) return 0;
+//		return chet(t->left) && chet(t->right);
+//	}
+//	return 1;
+//}
+//
+//int kl(tree* t)
+//{
+//	if (t == NULL) return 0;
+//	if (t->right != NULL && t->left != NULL)
+//		return 1 + kl(t->right) + kl(t->left);
+//	return kl(t->right) + kl(t->left);
+//}
+//
+//int pr(tree* t)
+//{
+//	if (t == NULL) return 0;
+//	if (t->right == NULL && t->left == NULL && t->info < 0)
+//		return t->info * pr(t->left) * pr(t->right);
+//	return pr(t->left) * pr(t->right);
+//}
+//
+//int main()
+//{
+//	int x;
+//	tree* root = new tree;
+//	cin >> x;
+//	root->info = x;
+//	root->left = NULL;
+//	root->right = NULL;
+//	for (cin >> x; x != 0; cin >> x)
+//		add_node(root, x);
+//	if (chet(root))
+//	{
+//		int k = kl(root);
+//		cout << k << endl;
+//	}
+//	else
+//	{
+//		int proizv = pr(root);
+//		cout << proizv << endl;
+//	}
+//}
+
+//2.2
+// 2 задание 
+// Если глубина дерева больше 5, то увеличить все нечетные листья на значение минимального
+// элемента, иначе - заменить отрицательные на введенное пользователем число.
+
+//bool glub(tree* t, int current_level)
+//{  
+//	if (t != NULL)
+//	{
+//		current_level++;
+//		return (current_level > 5) || glub(t->left, current_level) || glub(t->right, current_level);
+//	}
+//	return false;
+//}
+//
+//int mini(tree* t)
+//{
+//	if (t->left != NULL)
+//		return mini(t->left);
+//	return t->info;
+//}
+//
+//void uvel(tree* t, int a)
+//{
+//	if (t != NULL)
+//	{
+//		if (t->left == NULL && t->right == NULL && t->info % 2 != 0)
+//			t->info += a;
+//		uvel(t->left, a);
+//		uvel(t->right, a);
+//	}
+//}
+//
+//void zam(tree* t, int a)
+//{
+//	if (t != NULL)
+//	{
+//		if (t->info < 0)
+//			t->info = a;
+//		zam(t->left, a);
+//		zam(t->right, a);
+//	}
+//}
+//
+//int main()
+//{
+//	tree* root = new tree;
+//	int x, X, a;
+//	cout << "enter X = "; cin >> X;
+//	cout << "enter a = "; cin >> a;
+//	cin >> x;
+//	root->info = x;
+//	root->left = NULL;
+//	root->right = NULL;
+//	for (cin >> x; x != 0; cin >> x)
+//		add_node(root, x);
+//	if (glub(root, 0))
+//	{
+//		uvel(root, mini(root));
+//	}
+//	else
+//	{
+//		zam(root, a);
+//	}
+//	print_LNR(root);
+//}
+
+// 3 
+// Если в дереве есть хотя бы один кратный 3 лист, то посчитать кол-во вершин, у которых
+// есть только 1 сын, иначе - найти сумму положительных листьев.
+
+//bool kr(tree* t)
+//{
+//	if (t == NULL) return 0;
+//	if (t->left == NULL && t->right == NULL && t->info % 3 == 0) return 1;
+//	return kr(t->left) + kr(t->right);
+//}
+//
+//int kl(tree* t)
+//{
+//	if (t == NULL) return 0;
+//	if ((t->right != NULL && t->left == NULL) || (t->right == NULL && t->left != NULL))
+//		return 1 + kl(t->right) + kl(t->left);
+//	return kl(t->right) + kl(t->left);
+//}
+//
+//int sum(tree* t)
+//{
+//	if (t == NULL) return 0;
+//	if (t->right == NULL && t->left == NULL && t->info > 0)
+//		return t->info + sum(t->left) + sum(t->right);
+//	return sum(t->left) + sum(t->right);
+//}
+//
+//int main()
+//{
+//	int x;
+//	tree* root = new tree;
+//	cin >> x;
+//	root->info = x;
+//	root->left = NULL;
+//	root->right = NULL;
+//	for (cin >> x; x != 0; cin >> x)
+//		add_node(root, x);
+//	if (kr(root))
+//	{
+//		int k = kl(root);
+//		cout << k << endl;
+//	}
+//	else
+//	{
+//		int s = sum(root);
+//		cout << s << endl;
+//	}
+//}
