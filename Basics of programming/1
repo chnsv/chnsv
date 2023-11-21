@@ -1,0 +1,705 @@
+#include <iostream>
+#include <set>
+#include <vector>
+#include <string>
+//#include <list>
+#include <map>
+#include <deque>
+#include <fstream>
+using namespace std;
+
+// Дана последовательность чисел, вывести в порядке возрастания цифры, что хоть раз встречаются в числах.
+
+//int main()
+//{
+//    vector<int> v;
+//    set<int> s;
+//    int x;
+//    cin >> x;
+//    while (x)
+//    {
+//        v.push_back(x);
+//        while (x)
+//        {
+//            s.insert(x % 10);
+//            x /= 10;
+//        }
+//        cin >> x;
+//    }
+//    for (set<int>::iterator it = s.begin(); it != s.end(); ++it)
+//        cout << *it << " ";
+//}
+
+// Дан массив чисел. Из всех нечётных элементов сделать однонаправленный список, из чётных - дерево. 
+// В дереве, если у родителя только один потомок, заменить значение родителя на число, равное количеству 
+// элементов дерева, кратных 3. В списке вставить после каждого элемента, оканчивающегося на 5, элемент равный 55
+
+//struct list
+//{
+//	int info;
+//	list* next;
+//};
+//struct tree
+//{
+//	int info;
+//	tree* left, * right;
+//};
+//void add_node(tree *root, int x)
+//{
+//	if (x < root->info)
+//	{
+//		if (root->left == NULL)
+//		{
+//			tree* r = new tree;
+//			r->info = x;
+//			r->left = NULL;
+//			r->right = NULL;
+//			root->left = r;
+//		}
+//		else add_node(root->left, x);
+//	}
+//	else
+//	{
+//		if (root->right == NULL)
+//		{
+//			tree* r = new tree;
+//			r->info = x;
+//			r->left = NULL;
+//			r->right = NULL;
+//			root->right = r;
+//		}
+//		else add_node(root->right, x);
+//	}
+//}
+//void print_LNR(tree* root)
+//{
+//	if (root != NULL)
+//	{
+//		print_LNR(root->left);
+//		cout << root->info << " ";
+//		print_LNR(root->right);
+//	}
+//}
+//int kol(tree* t)
+//{
+//	if (t == NULL) return 0;
+//	if (t->info % 3 == 0) return 1 + kol(t->left) + kol(t->right);
+//	return kol(t->left) + kol(t->right);
+//}
+//void zam(tree* t, int k)
+//{
+//	if (t != NULL)
+//	{
+//		if ((t->left == NULL && t->right != NULL) || (t->left != NULL && t->right == NULL))
+//			t->info = k;
+//		zam(t->left, k);
+//		zam(t->right, k);
+//	}
+//
+//}
+//
+//int main()
+//{
+//	int x, n;
+//	list* head, * p, * r;
+//	cout << "Enter size: "; cin >> n;
+//	int* a = new int[n];
+//	for (int i = 0; i < n; i++)
+//		cin >> a[i];
+//	head = new list;
+//	head->info = 0;
+//	head->next = NULL;
+//	p = head;
+//	tree* root = new tree;
+//	root->info = -1;
+//	for (int i = 0; i < n; i++)
+//	{
+//		if (a[i] % 2 != 0)
+//		{
+//			r = new list;
+//			r->info = a[i];
+//			r->next = NULL;
+//			p->next = r;
+//			p = r;
+//		}
+//	}
+//	for (int i = 0; i < n; i++)
+//	{
+//		if (a[i] % 2 == 0)
+//		{
+//			if (root->info == -1)
+//			{
+//				root->info = a[i];
+//				root->left = NULL;
+//				root->right = NULL;
+//			}
+//			else add_node(root, a[i]);
+//		}
+//	}
+//	// УДАЛЕНИЕ ФИКТИВНОЙ ГОЛОВЫ, Т.Е. 0
+//	r = head;
+//	head = head->next;
+//	delete r;
+//	cout << "LIST: " << endl;
+//	p = head;
+//	while (p != NULL)
+//	{
+//		cout << p->info << " ";
+//		p = p->next;
+//
+//	}
+//	cout << endl;
+//	cout << "TREE: " << endl;
+//	print_LNR(root);
+//	cout << endl;
+//	p = head;
+//	while (p != NULL)
+//	{
+//		if (p->info % 10 == 5)
+//		{
+//			r = new list;
+//			r->info = 55;
+//			r->next = p->next;
+//			p->next = r;
+//			p = r;
+//		}
+//		p = p->next;
+//	}
+//	cout << "LIST: " << endl;
+//	p = head;
+//	while (p != NULL)
+//	{
+//		cout << p->info << " ";
+//		p = p->next;
+//
+//	}
+//	cout << endl;
+//	int k = kol(root);
+//	cout << "k = " << k << endl;
+//	zam(root, k);
+//	cout << "TREE: " << endl;
+//	print_LNR(root);
+//	cout << endl;
+//}
+
+// Дан вектор размера N. Если какой либо элемент повторяется, удалить все такие элементы. 
+// Вывести размер вектора и его элементы.
+
+//int main()
+//{
+//	int x;
+//	cin >> x;
+//	vector <int> v;
+//	set <int> s;
+//	while (x)
+//	{
+//		v.push_back(x);
+//		cin >> x;
+//	}
+//	s.insert(v.begin(), v.end());
+//	v.assign(s.begin(), s.end());
+//    for (vector <int>::iterator it = v.begin(); it != v.end(); ++it)
+//        cout << *it << " ";
+//	cout << endl;
+//	cout << "size = " << s.size();
+//}
+
+// Дан вектор размера N и целые числа K и L. Переставить с помощью итераторов
+// в обратном порядке элементы вектора, расположенные между элементами А[K] и A[L],
+// не включая эти элементы.
+
+//int main()
+//{
+//	int x, k, l;
+//	cout << "k = "; cin >> k;
+//	cout << "l = "; cin >> l;
+//	vector <int> v;
+//	for(cin >> x;x!=0;cin >>x)
+//		v.push_back(x);
+//
+//	cout << "Iznach: " << endl;
+//	for (vector <int>::iterator it = v.begin(); it != v.end(); ++it)
+//		cout << *it << " ";
+//	cout << endl;
+//	cout << "Izmen: " << endl;
+//	for (vector <int>::iterator it = v.begin(); it != v.begin() + k; ++it)
+//		cout << *it << " ";
+//	for (vector <int>::iterator it = v.begin()+l-2; it != v.begin() + k -1; --it)
+//		cout << *it << " ";
+//	for (vector <int>::iterator it = v.begin() + l - 1; it != v.end(); ++it)
+//		cout << *it << " ";
+//}
+
+// Дан список L. Удалить все элементы исходного списка с
+// четными порядковыми номерами (считая, что начальный элемент
+// списка имеет порядковый номер 1).
+
+//int main()
+//{
+//	list<int> l1{ 1, 2, 3, 4, 666, 777, 98938494, 123 };
+//
+//	int c = 0;
+//	for (list<int>::iterator it = l1.begin(); it != l1.end(); ) {
+//		if (++c % 2 == 0) {
+//			it = l1.erase(it);
+//		}
+//		else {
+//			it++;
+//		}
+//	}
+//	for (int a : l1) {
+//		cout << a << " ";
+//	}
+//}
+
+// Дано n строк. вывести для каждой буквы алфавита число строк, начинающихся с этой буквы, и сами строки.
+//aboba bebra abob gaymer gamer gomer fuck fitch you 0
+//a[aboba abob] - 2
+//b[bebra] - 1
+//f[fuck fitch] - 2
+//g[gaymer gamer gomer] - 3
+//y[you] - 1
+
+//int main()
+//{
+//	vector <string> v;
+//	map <char, vector<string>> m;
+//
+//	string x;
+//	cin >> x;
+//	while (x != "0") {
+//		v.push_back(x);
+//		cin >> x;
+//	}
+//	for (auto it = v.begin(); it != v.end(); it++) {
+//		char t = (*it).at(0);
+//		vector <string> v1 = m[t];
+//		v1.push_back(*it);
+//		m[t] = v1;
+//	}
+//	for (auto it = m.begin(); it != m.end(); it++) {
+//		cout << it->first << " " << "[ ";
+//		for (string a : it->second) {
+//			cout << a << " ";
+//		}
+//		cout << "] - ";
+//		cout << it->second.size() << endl;
+//	}
+//}
+
+// Даны вектор V, дек D и список L. Каждый исходный
+// контейнер содержит не менее трех элементов, количество элементов
+// является нечетным. Удвоить значения первого, среднего и
+// последнего элемента каждого из исходных контейнеров.
+
+//int main()
+//{
+//	vector<int> v1{ 1, 2, 3, 4, 5 };
+//	deque<int> d1{ 4, 6, 8, 10, 12 };
+//	list<int> l1{ 3, 6, 9, 12, 15 };
+//	v1.at(0) *= 2;
+//	d1.at(0) *= 2;
+//	l1.front() *= 2;
+//	v1.at(v1.size() / 2) *= 2;
+//	d1.at(d1.size() / 2) *= 2;
+//	int c = 0;
+//	for (list<int>::iterator it = l1.begin(); it != l1.end(); it++) {
+//		if (c++ == l1.size() / 2) {
+//			*it *= 2;
+//			break;
+//		}
+//	}
+//	v1.at(v1.size() - 1) *= 2;
+//	d1.at(d1.size() - 1) *= 2;
+//	l1.back() *= 2;
+//	for (int a : v1) {
+//		cout << a << " ";
+//	}
+//	cout << endl;
+//	for (int a : d1) {
+//		cout << a << " ";
+//	}
+//	cout << endl;
+//	for (int a : l1) {
+//		cout << a << " ";
+//	}
+//	cout << endl;
+//}
+
+// Дан двунаправленный список, если он убывающий, 
+// то продублировать не совершенный элемент после которого идет совершенный
+
+//struct DList {
+//	int info;
+//	DList* next;
+//	DList* prev;
+//};
+//
+//bool check(int a) {
+//	int s = 0;
+//	for (int i = 1; i < a; i++) {
+//		if (a % i == 0) {
+//			s += i;
+//		}
+//	}
+//	return s == a;
+//}
+//
+//int main()
+//{
+//	DList* head = new DList, *r, *p;
+//	head->next = NULL;
+//	head->prev = NULL;
+//	int x;
+//	cin >> x;
+//	head->info = x;
+//	p = head;
+//	cin >> x;
+//	while (x != 0) {
+//		DList* r = new DList;
+//		r->info = x;
+//		r->next = NULL;
+//		r->prev = p;
+//		p->next = r;
+//		p = r;
+//		cin >> x;
+//	}
+//	p = head;
+//	bool flag = true;
+//	while (p->next != NULL) {
+//		if (p->next->info >= p->info) {
+//			flag = false;
+//			break;
+//		}
+//		p = p->next;
+//	}
+//	p = head;
+//	if (flag) {
+//		while (p->next != NULL) {
+//			if (!check(p->info) && check(p->next->info)) {
+//				DList* r = new DList;
+//				r->next = p->next;
+//				r->prev = p;
+//				r->info = p->info;
+//				p->next->prev = r;
+//				p->next = r;
+//				p = r->next;
+//			}
+//			p = p->next;
+//		}
+//	}
+//	p = head;
+//	while (p != NULL) {
+//		cout << p->info << " ";
+//		p = p->next;
+//	}
+//	p = head;
+//	while (p != NULL) {
+//		r = p;
+//		p = p->next;
+//		delete r;
+//	}
+//}
+
+// Дан набор целых чисел, количество которых делится на 3.
+// Заполнить список L исходными числами и вывести вначале первую
+// треть элементов списка L в исходном порядке, затем вторую треть
+// элементов в обратном порядке, а затем последнюю треть (также в
+// обратном порядке).
+
+//int main()
+//{
+//	vector<int> s1{ 1, 3, 4, 5, 6, 7, 12, 9, 14 };
+//	list<int> l1;
+//	for (int a : s1) {
+//		l1.push_back(a);
+//	}
+//	int c = 0;
+//	for (list<int>::iterator it = l1.begin(); it != l1.end(); it++) {
+//		if (c++ < l1.size() / 3) {
+//			cout << *it << " ";
+//		}
+//	}
+//	c = 0;
+//	for (list<int>::reverse_iterator it = l1.rbegin(); it != l1.rend(); it++) {
+//		if (c++ >= l1.size() / 3 && c <= l1.size() - l1.size() / 3) {
+//			cout << *it << " ";
+//		}
+//	}
+//	c = 0;
+//	for (list<int>::reverse_iterator it = l1.rbegin(); it != l1.rend(); it++) {
+//		if (c++ < l1.size() / 3) {
+//			cout << *it << " ";
+//		}
+//	}
+//}
+
+// Cначала с клавиатуры вводится первая строка.
+// Затем вводится вторая строка.
+// В первой строке необходимо заменить все вхождения второй строки, 
+// которые не пересекаются с уже замененными участками, на количество таких вхождений второй строки в первой.
+// Например, если первая строка выглядит как "xxaxxa" и вторая строка "xa", 
+// то нужно заменить одну пару символов "xa" на число 2 (по количеству вхождений "xa" в первую строку),
+// а вторую пару символов "xa" на число 0 (потому что эти символы пересекаются с уже замененной парой). 
+// Результат должен быть выведен на экран или записан в файл, в зависимости от условий задачи.
+
+//int main()
+//{
+//	string s1 = "xxaxxa";
+//	string s2 = "xa";
+//	int k = 0;
+//	bool flag = true;
+//	string s3(s1);
+//	while (flag) {
+//		flag = false;
+//		int i1 = s3.find(s2);
+//		if (i1 != string::npos) {
+//			k += 1;
+//			s3.erase(i1, i1 + s2.length() - 1);
+//			flag = true;
+//		}
+//	}
+//	flag = true;
+//	while (flag) {
+//		flag = false;
+//		int i1 = s1.find(s2);
+//		if (i1 != string::npos) {
+//			s1.replace(i1, i1 + s2.length() - 1, to_string(k));
+//			k = 0;
+//			flag = true;
+//		}
+//	}
+//	cout << s1;
+//}
+
+/*
+Вывести из файла числа так, что четные - в однонаправленный список, а нечет - в дерево.
+В дереве все у кого только 1 потомок умножить на 2, а в списке удалить двузначные
+*/
+
+//struct list
+//{
+//	int info;
+//	list* next;
+//};
+//struct tree
+//{
+//	int info;
+//	tree* left, * right;
+//};
+//void add_node(tree *root, int x)
+//{
+//	if (x < root->info)
+//	{
+//		if (root->left == NULL)
+//		{
+//			tree* r = new tree;
+//			r->info = x;
+//			r->left = NULL;
+//			r->right = NULL;
+//			root->left = r;
+//		}
+//		else add_node(root->left, x);
+//	}
+//	else
+//	{
+//		if (root->right == NULL)
+//		{
+//			tree* r = new tree;
+//			r->info = x;
+//			r->left = NULL;
+//			r->right = NULL;
+//			root->right = r;
+//		}
+//		else add_node(root->right, x);
+//	}
+//}
+//void print_LNR(tree* root)
+//{
+//	if (root != NULL)
+//	{
+//		print_LNR(root->left);
+//		cout << root->info << " ";
+//		print_LNR(root->right);
+//	}
+//}
+//void uvel(tree* t)
+//{
+//	if (t != NULL)
+//	{
+//		if ((t->left == NULL && t->right != NULL) || (t->left != NULL && t->right == NULL))
+//			t->info *= 2;
+//		uvel(t->left);
+//		uvel(t->right);
+//	}
+//}
+//int main()
+//{
+//	int a, n;
+//	list* head, * p, * r;
+//	head = new list;
+//	head->info = 0;
+//	head->next = NULL;
+//	p = head;
+//	tree* root = new tree;
+//	root->info = -1;
+//	ifstream f("f.txt");
+//	if (!f)
+//	{
+//		cerr << "no";
+//		exit(1);
+//	}
+//	while (!f.eof() && f >> a)
+//	{
+//		if (a % 2 == 0)
+//		{
+//			r = new list;
+//			r->info = a;
+//			r->next = NULL;
+//			p->next = r;
+//			p = r;
+//		}
+//		else
+//		{
+//			if (root->info == -1)
+//			{
+//				root->info = a;
+//				root->left = NULL;
+//				root->right = NULL;
+//			}
+//			else add_node(root, a);
+//		}
+//	}
+//	// УДАЛЕНИЕ ФИКТИВНОЙ ГОЛОВЫ, Т.Е. 0
+//	r = head;
+//	head = head->next;
+//	delete r;
+//	cout << "LIST: " << endl;
+//	p = head;
+//	while (p != NULL)
+//	{
+//		cout << p->info << " ";
+//		p = p->next;
+//
+//	}
+//	cout << endl;
+//	cout << "TREE: " << endl;
+//	print_LNR(root);
+//	cout << endl;
+//	p = head;
+//	while (head->info > 9 && head->info < 100)
+//	{
+//		r = head;
+//		head = head->next;
+//		delete r;
+//	}
+//	p = head;
+//	while (p->next != NULL)
+//	{
+//		if (p->next->info > 9 && p->next->info < 100)
+//		{
+//			r = p->next;
+//			p->next= p->next->next;
+//			delete r;
+//			p = p->next;
+//		}
+//		else p = p->next;
+//	}
+//	cout << "LIST: " << endl;
+//	p = head;
+//	while (p != NULL)
+//	{
+//		cout << p->info << " ";
+//		p = p->next;
+//
+//	}
+//	cout << endl;
+//	uvel(root);
+//	cout << "TREE: " << endl;
+//	print_LNR(root);
+//	cout << endl;
+//}
+
+// Дана последовательность целых чисел, оканчивающаяся
+// нулем. Сформировать двунаправленный список на основе данной
+// последовательности. Положительные элементы списка расположить
+// в начале списка.
+
+//struct DList {
+//	int info;
+//	DList* next;
+//	DList* prev;
+//};
+//int main()
+//{
+//	DList* head2 = new DList, *p2;
+//	head2->next = NULL;
+//	head2->prev = NULL;
+//	DList* head = new DList, * p, * r;
+//	head->next = NULL;
+//	head->prev = NULL;
+//	bool flag = false;
+//	int x;
+//	cin >> x;
+//	head->info = x;
+//	p = head;
+//	p2 = head2;
+//	cin >> x;
+//	while (x != 0) {
+//		DList* r = new DList;
+//		r->next = NULL;
+//		r->prev = p;
+//		r->info = x;
+//		if (x < 0) {
+//			if (!flag) {
+//				head2->info = x;
+//				flag = true;
+//			}
+//			else {
+//				p2->next = r;
+//				p2 = r;
+//			}
+//		}
+//		else {
+//			p->next = r;
+//			p = r;
+//		}
+//		cin >> x;
+//	}
+//	p2 = head2;
+//	while (p2 != NULL) {
+//		DList* r = new DList;
+//		r->next = NULL;
+//		r->prev = p;
+//		r->info = p2->info;
+//		p->next = r;
+//		p = r;
+//		p2 = p2->next;
+//	}
+//	p = head;
+//	while (p != NULL) {
+//		cout << p->info << " ";
+//		p = p->next;
+//	}
+//}
+
+//	Написать программу, генерирующую слова на
+// вымышленном языке конкатенацией от одного до пяти миллионов суффиксов из
+// списка заданных суффиксов и одного или двух миллиардов корней из списка
+// допустимых корней в случайном порядке.
+
+//int main()
+//{
+//	vector<string> s1{ "Herrington", "dick", "anal", "ass", "bucks", "finger", "cum", "off" };
+//	vector<string> s2{ "Billy ", "fuck ", "suck ", "300 ", "stick ", "swallow my ", "so horny ", "jerk ", "fisting ", "" };
+//
+//	srand(time(NULL));
+//	for (int i = 0; i < 25; i++) {
+//		string s3;
+//		int k = rand() % s1.size();
+//		int k2 = rand() % s2.size();
+//		s3.append(s2.at(k2));
+//		s3.append(s1.at(k));
+//		cout << s3 << endl;
+//	}
+//}
