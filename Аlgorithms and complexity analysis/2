@@ -1,0 +1,67 @@
+#include <iostream>
+#include <stdlib.h>
+#define NUMBER_EXPEREMENTS 1000
+using namespace std;
+
+void sortpuz(int n, int* x, int& k)
+{
+	int temp;
+	for (int i = n - 1; i > 0; i--)
+	{
+		for (int j = 0; j < i; j++)
+		{
+			if (x[j] > x[j + 1])
+			{
+				temp = x[j];
+				x[j] = x[j + 1];
+				x[j + 1] = temp;
+				k += 3;
+			}
+			k++;
+		}
+	}
+}
+
+int main()
+{
+	srand(time(NULL));
+
+	int kmin[10], kmax[10], n = 0;
+	float mean[10];
+
+	for (int i = 0; i < 10; i++, n += 100)
+	{
+		int count = 0;
+		int* a = new int[n];
+
+		for (int q = 0; q < n; q++)
+			a[q] = i;
+		sortpuz(n, a, count);
+		kmin[i] = count;
+
+		count = 0;
+		for (int q = 0; q < n; q++)
+			a[q] = n - q;
+		sortpuz(n, a, count);
+		kmax[i] = count;
+
+		count = 0;
+		int s = 0;
+		for (int ex = 0; ex < NUMBER_EXPEREMENTS; ex++)
+		{
+			for (int q = 0; q < n; q++)
+			{
+				a[q] = rand();
+			}
+			sortpuz(n, a, count);
+			s += count;
+			count = 0;
+		}
+		mean[i] = float(s) / float(NUMBER_EXPEREMENTS);
+
+		for (int i = 0; i < 10; i++)
+		{
+			cout << "n = " << i * 100 + 100 << ":    min: " << kmin[i] << ",    max: " << kmax[i] << ",    mean: " << fixed << mean[i] << endl;
+		}
+	}
+}
