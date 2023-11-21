@@ -1,0 +1,345 @@
+#include <iostream>
+#include<set>
+#include<vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+[[maybe_unused]] const set<char> numbers = { '1', '2', '3', '4', '5', '6', '7', '8', '9', '0' };
+[[maybe_unused]] const set<char> symbols = { '(', ')', '/', '\\', '-', '&', 'X', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', ' ' };
+
+int K = 0;
+
+bool CheckExcess(const string& s) {
+    return all_of(s.begin(), s.end(), [](const char& c) {
+        return symbols.find(c) != symbols.end();
+    });
+}
+
+int NumberOfVariables(const string& s) {
+    set<string> per;
+    for (int i = 0; i < s.size(); i++) {
+        if (s[i] == 'X') {
+            K++;
+            string var = "X";
+            i++; K++;
+            while (i < s.size() && numbers.find(s[i]) != numbers.end()) {
+                var.push_back(s[i]);
+                i++; 
+                K++;
+            }
+            per.insert(var);
+        }
+    }
+    return per.size();
+}
+
+int NumberOfDisjuncts(const string& s) {
+    int kolvo = 0;
+    for (int i = 1; i < s.size(); i++) {
+        if (numbers.find(s[i - 1]) != numbers.end() && s[i] == '\\') 
+            kolvo++; 
+        K += 3;
+        if (s[i - 1] == '/') 
+            kolvo++; 
+        K++;
+    }
+    return kolvo;
+}
+// считаем резольвенту
+string Resolvent(string disjunct1, string disjunct2) {
+    vector<string> ob1, ob2, otr1, otr2;
+
+    for (int i = 1; i < disjunct1.size(); i++) {
+        if (disjunct1[i] == 'X' && disjunct1[i - 1] != '-') {
+            string var;
+            i++; 
+            K++;
+            while (i < disjunct1.size() && numbers.find(disjunct1[i]) != numbers.end()) {
+                K += 3;
+                var.push_back(disjunct1[i]);
+                i++; K++;
+            }
+            ob1.push_back(var);
+        }
+    }
+    for (int i = 1; i < disjunct2.size(); i++) {
+        if (disjunct2[i] == 'X' && disjunct2[i - 1] != '-') {
+            string var;
+            i++; 
+            K++;
+            while (i < disjunct2.size() && numbers.find(disjunct2[i]) != numbers.end()) {
+                K += 3;
+                var.push_back(disjunct2[i]);
+                i++; 
+                K++;
+            }
+            ob2.push_back(var);
+        }
+    }
+    for (int i = 1; i < disjunct1.size(); i++) {
+        if (disjunct1[i] == 'X' && disjunct1[i - 1] == '-') {
+            string var;
+            i++; 
+            K++;
+            while (i < disjunct1.size() && numbers.find(disjunct1[i]) != numbers.end()) {
+                K += 3;
+                var.push_back(disjunct1[i]);
+                i++; 
+                K++;
+            }
+            otr1.push_back(var);
+        }
+    }
+    for (int i = 1; i < disjunct2.size(); i++) {
+        if (disjunct2[i] == 'X' && disjunct2[i - 1] == '-') {
+            string var;
+            i++; 
+            K++;
+            while (i < disjunct2.size() && numbers.find(disjunct2[i]) != numbers.end()) {
+                K += 3;
+                var.push_back(disjunct2[i]);
+                i++; 
+                K++;
+            }
+            otr2.push_back(var);
+        }
+    }
+    sort(ob1.begin(), ob1.end());
+    sort(ob2.begin(), ob2.end());
+    sort(otr1.begin(), otr1.end());
+    sort(otr2.begin(), otr2.end());
+
+    //Контрарные пары
+    bool proverka = 0;
+    for (int i = 0; i < ob1.size(); i++) {
+        if (proverka) 
+            break;
+        for (int j = 0; j < otr2.size(); j++) {
+            if (ob1[i] == otr2[j]) { 
+                ob1.erase(ob1.begin() + i); 
+                otr2.erase(otr2.begin() + j); 
+                proverka = 1; 
+            } 
+            K++;
+        }
+    }
+    for (int i = 0; i < ob2.size(); i++) {
+        if (proverka) 
+            break;
+        for (int j = 0; j < otr1.size(); j++) {
+            if (ob2[i] == otr1[j]) { 
+                ob2.erase(ob2.begin() + i); 
+                otr1.erase(otr1.begin() + j); 
+                proverka = 1; 
+            } 
+            K++;
+        }
+    }
+    if (ob1.size() == 0 && ob2.size() == 0 && otr1.size() == 0 && otr2.size() == 0) {
+        return "";
+    } 
+    K += 4;
+
+    if (proverka == 1) {
+        disjunct1 = "(";
+        disjunct2 = "";
+        if (ob1.size() == 0 && otr1.size() == 0) {
+            disjunct1 = "(";
+        }
+        else if (ob1.size() == 0 && otr1.size() != 0) {
+            for (int i = 0; i < otr1.size(); i++) {
+                disjunct1 += ("-X" + otr1[i] + "\\/"); 
+                K++;
+            }
+        }
+        else if (ob1.size() != 0 && otr1.size() == 0) {
+            for (int i = 0; i < ob1.size(); i++) {
+                disjunct1 += ("X" + ob1[i] + "\\/"); 
+                K++;
+            }
+        }
+        else {
+            for (int i = 0; i < ob1.size(); i++) {
+                disjunct1 += ("X" + ob1[i] + "\\/"); 
+                K++;
+            }
+            for (int i = 0; i < otr1.size(); i++) {
+                disjunct1 += ("-X" + otr1[i] + "\\/"); 
+                K++;
+            }
+        }
+
+        if (ob2.size() == 0 && otr2.size() == 0) {
+            disjunct1.pop_back();
+            disjunct1.pop_back();
+            disjunct2.push_back(')');
+        }
+        else if (ob2.size() == 0 && otr2.size() != 0) {
+            for (int i = 0; i < otr2.size(); i++) {
+                disjunct2 += ("-X" + otr2[i] + "\\/");
+            }
+            disjunct2.pop_back();
+            disjunct2.pop_back();
+            disjunct2.push_back(')');
+        }
+        else if (ob2.size() != 0 && otr2.size() == 0) {
+            for (int i = 0; i < ob2.size(); i++) {
+                disjunct2 += ("X" + ob2[i] + "\\/"); 
+                K++;
+            }
+            disjunct2.pop_back();
+            disjunct2.pop_back();
+            disjunct2.push_back(')');
+        }
+        else {
+            for (int i = 0; i < ob2.size(); i++) {
+                disjunct2 += ("X" + ob2[i] + "\\/"); 
+                K++;
+            }
+            for (int i = 0; i < otr2.size(); i++) {
+                disjunct2 += ("-X" + otr2[i] + "\\/"); 
+                K++;
+            }
+            disjunct2.pop_back();
+            disjunct2.pop_back();
+            disjunct2.push_back(')');
+        }
+        return disjunct1 + disjunct2;
+    }
+    else { 
+        return disjunct1 + disjunct2; 
+    }
+}
+
+void RemoveTheSpace(string& s) {
+    for (int i = 0; i < s.size(); i++) {
+        if (s[i] == ' ') { 
+            s.erase(s.begin() + i); 
+            i--; 
+            K++; 
+        } 
+        K++;
+    }
+}
+
+vector<string> fragment(const string& s) {
+    vector<string> v;
+    string disjunct;
+    for (int i = 0; i < s.size(); i++) {
+        if (s[i] == '&') 
+            continue;
+        while (s[i] != ')') {
+            disjunct.push_back(s[i]);
+            i++; 
+            K++;
+        }
+        disjunct.push_back(s[i]);
+        v.push_back(disjunct);
+        disjunct.clear();
+    }
+    return v;
+}
+
+bool EmptyDisjunct(const string& s) {
+    int i = 1;
+    vector<string> a, b;
+    string c;
+    while (i < s.size())
+    {
+        if (s[i] == 'X' && s[i - 1] != '-') {
+            i++; K++;
+            c = "";
+            while (numbers.find(s[i]) != numbers.end()) { 
+                c.push_back(s[i]); 
+                i++; 
+                K++; 
+            }
+            b.push_back(c);
+            K++;
+        }
+        K += 2;
+        if (s[i] == 'X' && s[i - 1] == '-') {
+            i++; 
+            K++;
+            c = "";
+            while (numbers.find(s[i]) != numbers.end()) { 
+                c.push_back(s[i]); 
+                i++; 
+                K++; 
+            }
+            a.push_back(c);
+            K++;
+        }
+        i++;
+        K++;
+    }
+    sort(b.begin(), b.end());
+    sort(a.begin(), a.end());
+    if (b == a) { 
+        return true; 
+    }
+    else { 
+        return false; 
+    }
+
+}
+
+void proverka(vector<string> v) {
+    if (EmptyDisjunct(v[0]) == 1 && v.size() == 1) { 
+        cout << "Есть пустая резольвента,значит КНФ не выполнима"; 
+        return; 
+    }
+    K += 2;
+    string disjunct1;
+    string disjunct2;
+    int vs = v.size();
+    for (int i = 0; i < v.size(); i++) {
+        for (int j = i; j < v.size(); j++) {
+            if (i != j) {
+                disjunct1 = v[i];
+                disjunct2 = v[j];
+                string res = Resolvent(disjunct1, disjunct2);
+                if (EmptyDisjunct(disjunct1) == 1 || EmptyDisjunct(disjunct2) == 1) { 
+                    cout << "Есть пустая резольвента, значит КНФ не выполнима"; 
+                    return; 
+                }
+                K += 2;
+                if (res != disjunct1 + disjunct2) {
+                    //v.erase(v.begin()+i);
+                    //v.erase(v.begin()+j-1);
+                    v.push_back(res);
+                    for (string dis : v) cout << dis << " ";
+                    cout << endl;
+                    if (res == "" || EmptyDisjunct(res) == 1) { 
+                        cout << "Есть пустая резольвента, значит КНФ не выполнима"; 
+                        return; 
+                    }
+                    vs = res.size();
+                    K += 3;
+                }
+
+            }
+        }
+    }
+    cout << "КНФ выполнима "; return;
+}
+
+int main()
+{
+    setlocale(LC_ALL, "rus");
+    string s;
+    getline(cin, s);
+    if (!CheckExcess(s)) { 
+        cout << "Ошибка!"; 
+        return 0; 
+    }
+    RemoveTheSpace(s);
+    cout << "Первоначальная КНФ: " << s << endl;
+    cout << "Кол-во различных переменных: " << NumberOfVariables(s) << endl;
+    cout << "Кол-во дизъюнктов: " << NumberOfDisjuncts(s) << endl;
+    vector<string> v = fragment(s);
+    cout << "Проверка: "; proverka(v); cout << endl;
+    cout << "Примерное кол-во элементарных операций: " << K;
+
+    return 0;
+}
