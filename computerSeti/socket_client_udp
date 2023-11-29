@@ -22,25 +22,25 @@ int main()
         return -1;
     }
     // Шаг 2 - открытие сокета
-    SOCKET my_sock = socket(AF_INET, SOCK_DGRAM, 0);
+    SOCKET my_sock = socket(AF_INET, SOCK_DGRAM, 0); // 1 - домен, 2 - потоковое соеденение, 3 - 0
     if (my_sock == INVALID_SOCKET) {
         cout << "SOCKET() ERROR: " << WSAGetLastError() << "\n";
-        WSACleanup();
+        WSACleanup(); //Функция прекращает использование библиотеки DLL Winsock
         return -1;
     }
     // Шаг 3 - обмен сообщений с сервером
-    HOSTENT* hst;
-    sockaddr_in Daddr;
-    Daddr.sin_family = AF_INET;
-    Daddr.sin_port = htons(PORT);
+    HOSTENT* hst; //структура хоста используется функциями для хранения информациий о данном узле.
+    sockaddr_in Daddr; // Структура SOCKADDR_IN определяет транспортный адрес и порт для семейства адресов AF_INET.
+    //sin_family, sin_port хранятся в sockaddr_in
+    Daddr.sin_family = AF_INET; //адрес домена
+    Daddr.sin_port = htons(PORT); //номер порта транспортного протокола
 
     // определение IP-адреса узла
-    if (inet_addr(SERVERADDR))
-        Daddr.sin_addr.s_addr = inet_addr(SERVERADDR);
+    if (inet_addr(SERVERADDR)) //преобразует строку в адрес для структуры
+        Daddr.sin_addr.s_addr = inet_addr(SERVERADDR); // содержит транспорт IPv4 адрес.
     else
-        if (hst = gethostbyname(SERVERADDR))
-            Daddr.sin_addr.s_addr = ((unsigned long**)
-                hst->h_addr_list)[0][0];
+        if (hst = gethostbyname(SERVERADDR)) // извлекаем информацию о хосте
+            Daddr.sin_addr.s_addr = ((unsigned long**)hst->h_addr_list)[0][0];
         else {
             cout << "Unknown Host: " << WSAGetLastError() << "\n";
             closesocket(my_sock);
@@ -55,13 +55,21 @@ int main()
         if (SS == "quit") break;
 
         // Передача сообщений на сервер
-        sendto(my_sock, (char*)&SS[0], SS.size(), 0,
-            (sockaddr*)&Daddr, sizeof(Daddr));
+        sendto(my_sock, (char*)&SS[0], SS.size(), 0, (sockaddr*)&Daddr, sizeof(Daddr));
+        //отправляет данные в определенное место назначения, 1-сокет, 2- указатель на буфер содержащий данные,
+        // 3- длина данных в байтах, 4- набор флагов определяющих способ выполнения,
+        // 5- Необязательный указатель на структуру sockaddr, содержащую адрес целевого сокета,
+        // 6-размер адреса в байтах.
+        
         // Прием сообщения с сервера
         sockaddr_in SRaddr;
         int SRaddr_size = sizeof(SRaddr);
-        int n = recvfrom(my_sock, buff, sizeof(buff), 0,
-            (sockaddr*)&SRaddr, &SRaddr_size);
+        int n = recvfrom(my_sock, buff, sizeof(buff), 0, (sockaddr*)&SRaddr, &SRaddr_size);
+        //получает данные и сохраняет адрес источника, 1-сокет, 2- буфер для входящих данных,
+        // 3- длина буфера в байтах, 4- Набор параметров, изменяющих поведение вызова функции 
+        // за пределами параметров, указанных для связанного сокета,
+        // 5- Необязательный указатель на буфер в структуре sockaddr, содержащую исходный адрес при возврате,
+        // 6- необязательный указатель на размер буфера в байтах.
         if (n == SOCKET_ERROR) {
             cout << "RECVFROM() ERROR:" << WSAGetLastError() << "\n";
             closesocket(my_sock);
@@ -73,7 +81,7 @@ int main()
         cout << "S=>C:" << buff << "\n";
     }
     // шаг последний - выход
-    closesocket(my_sock);
+    closesocket(my_sock); //закрывает существующий сокет
     WSACleanup();
     return 0;
 }
