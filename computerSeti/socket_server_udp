@@ -33,6 +33,10 @@ int main() {
     Laddr.sin_addr.s_addr = INADDR_ANY;   // или 0 (любой IP адрес)
     Laddr.sin_port = htons(PORT);
     if (bind(Lsock, (sockaddr*)&Laddr, sizeof(Laddr)))
+    //Функция bind связывает локальный адрес с сокетом. 1- сокет, 
+    //2-Указатель на структуру sockaddr локального адреса, который должен быть назначен связанному сокету.
+    //3-Длина (в байтах) значения, на которое указывает параметр (sockaddr*)&Laddr.
+
     {
         cout << "BIND ERROR:" << WSAGetLastError();
         closesocket(Lsock);
