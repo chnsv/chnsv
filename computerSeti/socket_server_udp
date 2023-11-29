@@ -16,27 +16,24 @@ int main() {
     // шаг 1 - подключение библиотеки 
     if (WSAStartup(0x202, (WSADATA*)&buff[0]))
     {
-        cout << "WSAStartup error: " << WSAGetLastError();
+        cout << "WSAStartup error: " << WSAGetLastError();//ошибка
         return -1;
     }
     // шаг 2 - создание сокета
-    SOCKET Lsock;
-    Lsock = socket(AF_INET, SOCK_DGRAM, 0);
+    SOCKET Lsock;// создаем сокет
+    Lsock = socket(AF_INET, SOCK_DGRAM, 0);//это протокол на основе дейтаграмм.
+    //Вы отправляете одну дейтаграмму и получаете один ответ, после чего соединение прерывается.
     if (Lsock == INVALID_SOCKET) {
-        cout << "SOCKET() ERROR: " << WSAGetLastError();
+        cout << "SOCKET() ERROR: " << WSAGetLastError();//ошибка в сокете
         WSACleanup();
         return -1;
     }
     // шаг 3 - связывание сокета с локальным адресом 
-    sockaddr_in Laddr;
+    sockaddr_in Laddr;// создание и заполнение структуры адреса клиента
     Laddr.sin_family = AF_INET;
-    Laddr.sin_addr.s_addr = INADDR_ANY;   // или 0 (любой IP адрес)
-    Laddr.sin_port = htons(PORT);
+    Laddr.sin_addr.s_addr = INADDR_ANY;   // постоянное значение, ip-адрес
+    Laddr.sin_port = htons(PORT); //номер порта транспортного протокола
     if (bind(Lsock, (sockaddr*)&Laddr, sizeof(Laddr)))
-    //Функция bind связывает локальный адрес с сокетом. 1- сокет, 
-    //2-Указатель на структуру sockaddr локального адреса, который должен быть назначен связанному сокету.
-    //3-Длина (в байтах) значения, на которое указывает параметр (sockaddr*)&Laddr.
-
     {
         cout << "BIND ERROR:" << WSAGetLastError();
         closesocket(Lsock);
