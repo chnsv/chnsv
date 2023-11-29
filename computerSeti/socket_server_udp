@@ -41,18 +41,24 @@ int main() {
     }
     // шаг 4 обработка пакетов, присланных клиентами
     while (1) {
-        sockaddr_in Caddr;
-        int Caddr_size = sizeof(Caddr);
-        int bsize = recvfrom(Lsock, &buff[0], sizeof(buff) - 1, 0,
-            (sockaddr*)&Caddr, &Caddr_size);
+        sockaddr_in Caddr; //// Структура SOCKADDR_IN определяет транспортный адрес и порт для семейства адресов AF_INET.
+        int Caddr_size = sizeof(Caddr); //длина буфера
+        int bsize = recvfrom(Lsock, &buff[0], sizeof(buff) - 1, 0, (sockaddr*)&Caddr, &Caddr_size);
+        //получает данные и сохраняет адрес источника, 1-сокет, 2- буфер для входящих данных,
+        // 3- длина буфера в байтах, 4- Набор параметров, изменяющих поведение вызова функции 
+        // за пределами параметров, указанных для связанного сокета,
+        // 5- Необязательный указатель на буфер в структуре sockaddr, содержащую исходный адрес при возврате,
+        // 6- необязательный указатель на размер буфера в байтах.
         if (bsize == SOCKET_ERROR)
             cout << "RECVFROM() ERROR:" << WSAGetLastError();
         // Определяем IP-адрес клиента и прочие атрибуты
-        HOSTENT* hst;
+        HOSTENT* hst; ////структура хоста используется функциями для хранения информациий о данном узле.
         hst = gethostbyaddr((char*)&Caddr.sin_addr, 4, AF_INET);
-        cout << "NEW DATAGRAM!\n" <<
-            ((hst) ? hst->h_name : "Unknown host") << "/n" <<
-            inet_ntoa(Caddr.sin_addr) << "/n" << ntohs(Caddr.sin_port) << '\n';
+        //извлекает информацию об узле, соответствующую сетевому адресу.
+        //1 - указатель на структуру, 2- длина, 3- тип)
+        cout << "NEW DATAGRAM!\n" << ((hst) ? hst->h_name : "Unknown host") << "/n" << inet_ntoa(Caddr.sin_addr) << "/n" << ntohs(Caddr.sin_port) << '\n';
+        //Функция inet_ntoa преобразует сетевой адрес Интернета (Ipv4) в строку ASCII в стандартном формате Интернета с десятичной дробью.
+        // Функция ntohs преобразует u_short из порядка байтов сети TCP/IP в порядок байтов узла
         buff[bsize] = '\0';              // добавление завершающего нуля
         cout << "C=>S:" << buff << '\n';        // Вывод на экран 
     // посылка датаграммы клиенту
