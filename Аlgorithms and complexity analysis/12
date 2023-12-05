@@ -178,3 +178,210 @@ int main()
     }
     return 0;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#include <sstream>
+#include <string>
+#include <iostream>
+#include <vector>
+using namespace std;
+
+int koll;
+vector< vector<int> > X, Y, Z;
+void sozd(int n, vector< vector<int> >& nn) //Эта фу-ия sozd используется для создания случайной мат n x n и 
+сохранения в векторе nn.
+{
+    for (int i = 0; i < n; i++)
+    {
+        vector<int> vectorr;
+        for (int j = 0; j < n; j++)
+            vectorr.push_back(rand() % 10);
+        nn.push_back(vectorr);
+    }
+}
+void sozd2(int n) //Эта функция sozd2 используется для создания нулевой матрицы n x n и сохранения ее в Z-
+векторе.
+{
+    for (int i = 0; i < n; i++)
+    {
+        vector<int> vect;
+        for (int j = 0; j < n; j++)
+            vect.push_back(0);
+        Z.push_back(vect);
+    }
+}
+void add(vector< vector<int> >& X, //Эта функция add выполняет сложение матриц. Она принимает три матрицы
+    //X, Y и Z в качестве вход данных и добавляет элементы X и Y для сохранения результата в Z. Переменная koll 
+увеличивается для каждой операции сложения.
+    vector< vector<int> >& Y,
+    vector< vector<int> >& Z, int m)
+{
+    for (int i = 0; i < m; i++)
+    {
+        for (int j = 0; j < m; j++)
+        {
+            Z[i][j] = X[i][j] + Y[i][j];
+            koll++;
+        }
+    }
+}
+void sub(vector< vector<int> >& X, //Эта функция выполняет вычитание матрицы. Она принимает три матрицы 
+    //X, Y и Z в качестве входных данных и вычитает соответствующие элементы Y из X, чтобы сохранить 
+результат в Z.
+    //  Переменная koll увеличивается для каждой операции вычитания.
+    vector< vector<int> >& Y,
+    vector< vector<int> >& Z, int m)
+{
+    for (int i = 0; i < m; i++)
+    {
+        for (int j = 0; j < m; j++)
+        {
+            Z[i][j] = X[i][j] - Y[i][j];
+            koll++;
+        }
+    }
+}
+void mult(vector< vector<int> >& X, //Эта функция mult выполняет умножение матриц с использованием алгоритма 
+Штрассена. 
+    //Она принимает три матрицы X, Y и Z и размер n матриц в качестве входных данных. 
+    //Если n меньше или равно 1, она выполняет обычный алгоритм умножения матриц. 
+    //В противном случае он делит матрицы на более мелкие подматрицы и рекурсивно выполняет умножение 
+матриц с использованием алгоритма Штрассена.
+    vector< vector<int> >& Y,
+    vector< vector<int> >& Z, int n)
+{
+    if (n <= 1) {
+        for (int i = 0; i < n; i++)
+        {
+            for (int k = 0; k < n; k++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    Z[i][j] += X[i][k] * Y[k][j];
+                    koll += 2;
+                }
+            }
+        }
+        return;
+    }
+    else {
+        int kr = n / 2;
+        vector<int> st(kr);
+        vector< vector<int> >
+            a11(kr, st), a12(kr, st), a21(kr, st), a22(kr, st),
+            b11(kr, st), b12(kr, st), b21(kr, st), b22(kr, st),
+            c11(kr, st), c12(kr, st), c21(kr, st), c22(kr, st),
+            m1(kr, st), m2(kr, st), m3(kr, st), m4(kr, st),
+            m5(kr, st), m6(kr, st), m7(kr, st),
+            XRES(kr, st), YRES(kr, st);
+        for (int i = 0; i < kr; i++)
+        {
+            for (int j = 0; j < kr; j++)
+            {
+                a11[i][j] = X[i][j];
+                a12[i][j] = X[i][j + kr];
+                a21[i][j] = X[i + kr][j];
+                a22[i][j] = X[i + kr][j + kr];
+
+                b11[i][j] = Y[i][j];
+                b12[i][j] = Y[i][j + kr];
+                b21[i][j] = Y[i + kr][j];
+                b22[i][j] = Y[i + kr][j + kr];
+            }
+        }
+        sub(a12, a22, XRES, kr);
+        add(b21, b22, YRES, kr);
+        mult(XRES, YRES, m1, kr);
+        add(a11, a22, XRES, kr);
+        add(b11, b22, YRES, kr);
+        mult(XRES, YRES, m2, kr);
+        sub(a11, a21, XRES, kr);
+        add(b11, b12, YRES, kr);
+        mult(XRES, YRES, m3, kr);
+        add(a11, a12, XRES, kr);
+        mult(XRES, b22, m4, kr);
+        sub(b12, b22, YRES, kr);
+        mult(a11, YRES, m5, kr);
+        sub(b21, b11, YRES, kr);
+        mult(a22, YRES, m6, kr);
+        add(a21, a22, XRES, kr);
+        mult(XRES, b11, m7, kr);
+        add(m1, m2, XRES, kr);
+        add(XRES, m6, YRES, kr);
+        sub(YRES, m4, c11, kr);
+        add(m4, m5, c12, kr);
+        add(m6, m7, c21, kr);
+        sub(m2, m3, XRES, kr);
+        add(XRES, m5, YRES, kr);
+        sub(YRES, m7, c22, kr);
+        for (int i = 0; i < kr; i++)
+        {
+            for (int j = 0; j < kr; j++)
+            {
+                Z[i][j] = c11[i][j];
+                Z[i][j + kr] = c12[i][j];
+                Z[i + kr][j] = c21[i][j];
+                Z[i + kr][j + kr] = c22[i][j];
+            }
+        }
+    }
+}
+void vvod(vector< vector<int> > matrix, int n) //Эта функция vvod используется для печати матрицы. Она принимает 
+матрицу matrix и ее размер n в качестве входных данных 
+//и печатает элементы матрицы.
+
+{
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
+            cout << matrix[i][j] << " ";
+        }
+        cout << endl;
+    }
+    cout << endl;
+}
+int main() //Это основная функция. Он инициализирует генератор случайных чисел, а затем для каждого значения i 
+от 4 до 1024 (умножая i на 2 на каждой итерации) 
+//создает две случайные матрицы X и Y размера i x i, используя функцию sozd, создает нулевую матрицу Z 
+размера i x i, используя функцию sozd2, выполняет
+//умножение матрицы с помощью функции mult и выводит значение i и количество выполненных операций (koll). 
+Наконец, он очищает матрицы X, Y и Z для следующей итерации.
+{
+    srand(time(0));
+    for (int i = 4; i <= 1024; i *= 2)
+    {
+        sozd(i, X);
+        sozd(i, Y);
+        sozd2(i);
+        koll = 0;
+        mult(X, Y, Z, i);
+        cout << i << ":\t" << koll << endl;
+        X.clear();
+        Y.clear();
+        Z.clear();
+    }
+    return 0;
+}
