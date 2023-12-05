@@ -1,68 +1,67 @@
-// UDP-эхо сервер
-#define _WINSOCK_DEPRECATED_NO_WARNINGS
-#include <winsock2.h>
-#include <windows.h>
-#include <string>
-#include <iostream>
-#pragma comment(lib, "Ws2_32.lib")
-#pragma warning(disable: 4996)
+//server  
+#include <iostream>  
+#include <winsock2.h>  
+#include <Ws2tcpip.h> // Добавляем заголовочный файл для использования inet_ntop и INET_ADDRSTRLEN  
+#pragma comment(lib,"ws2_32.lib")  
+#pragma warning(disable: 4996)  
 using namespace std;
-#define PORT 666    // порт сервера
-#define sHELLO "Hello, STUDENT\n"
 
-int main() {
-    char buff[1024];
-    cout << "UDP DEMO ECHO-SERVER\n";
-    // шаг 1 - подключение библиотеки 
-    if (WSAStartup(0x202, (WSADATA*)&buff[0]))
+struct Person
+{
+    string name;
+    double grade[4];
+};
+
+int main()
+{
+    double ans;
+    WSADATA wsa;
+    cout << "Initialising Winsock...";
+    if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
     {
-        cout << "WSAStartup error: " << WSAGetLastError();//ошибка
-        return -1;
+        cout << "Failed. Error Code : " << WSAGetLastError();
+        return 1;
     }
-    // шаг 2 - создание сокета
-    SOCKET Lsock;// создаем сокет
-    Lsock = socket(AF_INET, SOCK_DGRAM, 0);//это протокол на основе дейтаграмм.
-    //Вы отправляете одну дейтаграмму и получаете один ответ, после чего соединение прерывается.
-    if (Lsock == INVALID_SOCKET) {
-        cout << "SOCKET() ERROR: " << WSAGetLastError();//ошибка в сокете
-        WSACleanup();
-        return -1;
-    }
-    // шаг 3 - связывание сокета с локальным адресом 
-    sockaddr_in Laddr;// создание и заполнение структуры адреса клиента
-    Laddr.sin_family = AF_INET;
-    Laddr.sin_addr.s_addr = INADDR_ANY;   // постоянное значение, ip-адрес
-    Laddr.sin_port = htons(PORT); //номер порта транспортного протокола
-    if (bind(Lsock, (sockaddr*)&Laddr, sizeof(Laddr)))
+    cout << "Complete" << endl;
+
+    cout << "Creating socket...";
+    SOCKET ListenSock = socket(AF_INET, SOCK_DGRAM, 0);
+    if (ListenSock == INVALID_SOCKET)
     {
-        cout << "BIND ERROR:" << WSAGetLastError();
-        closesocket(Lsock);
-        WSACleanup();
-        return -1;
+        cout << "Failed.";
+        return 1;
     }
-    // шаг 4 обработка пакетов, присланных клиентами
-    while (1) {
-        sockaddr_in Caddr; //// Структура SOCKADDR_IN определяет транспортный адрес и порт для семейства адресов AF_INET.
-        int Caddr_size = sizeof(Caddr); //длина буфера
-        int bsize = recvfrom(Lsock, &buff[0], sizeof(buff) - 1, 0, (sockaddr*)&Caddr, &Caddr_size);
-        //получает данные и сохраняет адрес источника, 1-сокет, 2- буфер для входящих данных,
-        // 3- длина буфера в байтах, 4- Набор параметров, изменяющих поведение вызова функции 
-        // за пределами параметров, указанных для связанного сокета,
-        // 5- Необязательный указатель на буфер в структуре sockaddr, содержащую исходный адрес при возврате,
-        // 6- необязательный указатель на размер буфера в байтах.
-        if (bsize == SOCKET_ERROR)
-            cout << "RECVFROM() ERROR:" << WSAGetLastError();
-        // Определяем IP-адрес клиента и прочие атрибуты
-        HOSTENT* hst; ////структура хоста используется функциями для хранения информациий о данном узле.
-        hst = gethostbyaddr((char*)&Caddr.sin_addr, 4, AF_INET);
-        //извлекает информацию об узле, соответствующую сетевому адресу.
-        //1 - указатель на структуру, 2- длина, 3- тип)
-        cout << "NEW DATAGRAM!\n" << ((hst) ? hst->h_name : "Unknown host") << "/n" << inet_ntoa(Caddr.sin_addr) << "/n" << ntohs(Caddr.sin_port) << '\n';
-        //Функция inet_ntoa преобразует сетевой адрес Интернета (Ipv4) в строку ASCII в стандартном формате Интернета с десятичной дробью.
-        // Функция ntohs преобразует u_short из порядка байтов сети TCP/IP в порядок байтов узла
-        buff[bsize] = '\0';              // добавление завершающего нуля
-        cout << "C=>S:" << buff << '\n';        // Вывод на экран 
-    // посылка датаграммы клиенту
-        sendto(Lsock, &buff[0], bsize, 0, (sockaddr*)&Caddr, sizeof(Caddr));
-    }      return 0;
+    cout << "Complete" << endl;
+
+    sockaddr_in serv;
+    serv.sin_addr.s_addr = INADDR_ANY;
+    serv.sin_family = AF_INET;
+    serv.sin_port = htons(1234);
+
+    bind(ListenSock, (sockaddr*)&serv, sizeof(serv));
+
+    Person human;
+    sockaddr_in from_serv;
+    string ot;
+
+    while (1)
+    {
+        char clientIp[INET_ADDRSTRLEN];
+        int from_len = sizeof(from_serv);
+
+        // Принятие данных от клиента  
+        ot = recvfrom(ListenSock, (char*)&human, sizeof(human), 0, (sockaddr*)&from_serv, &from_len);
+
+        // Вывод IP-адреса клиента  
+        inet_ntop(AF_INET, &from_serv.sin_addr, clientIp, INET_ADDRSTRLEN);
+        cout << "Client IP: " << clientIp << endl;
+
+        cout << "Received data: Name: " << human.name << ", grade: " << human.grade[0] << "," << human.grade[1] << "," << human.grade[2] << "," << human.grade[3] << endl;
+        ans = (human.grade[0] + human.grade[1] + human.grade[2] + human.grade[3]) / 4;
+        cout << "Sr znach: " << ans << endl;
+
+        sendto(ListenSock, (char*)&ans, sizeof(ans), 0, (sockaddr*)&from_serv, from_len);
+    }
+
+    return 0;
 }
