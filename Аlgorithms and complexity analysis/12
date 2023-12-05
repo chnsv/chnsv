@@ -1,125 +1,180 @@
 #include <iostream>
 #include <vector>
+
 using namespace std;
 
-long long k = 0;
+int k = 0;
+vector<vector<int>> M1, M2, Res;
 
-vector<vector<int>> Generate(int n) {
-    vector<int>v(n, 0);
-    vector<vector<int>> M(n, v);
-    for (vector<int>& vect : M) {
-        for (int& element : vect) {
-            element = rand() % 10;
+void Generate(vector<vector<int>> &A, int n) {
+    for (int i = 0; i < n; i++) {
+        vector<int>res;
+        for (int j = 0; j < n; j++) {
+            res.push_back(rand() % 9);
         }
+        A.push_back(res);
     }
-    return M;
 }
-void print(vector<vector<int>>M) {
-    for (vector<int>vect : M) {
-        for (int element : vect) {
-            cout << element << " ";
+void GenerateNull(int n) {
+    for (int i = 0; i < n; i++) {
+        vector<int> res;
+        for (int j = 0; j < n; j++)
+            res.push_back(0);
+        Res.push_back(res);
+    }
+}
+
+void print(vector< vector<int> > A, int n) {
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            cout << A[i][j] << " ";
         }
         cout << endl;
     }
+    cout << endl;
 }
 
 // Функция для сложения двух матриц
-vector<vector<int>> Add(const vector<vector<int>>& A, const vector<vector<int>>& B) {
-    vector<int> v(A[0].size(), 0);
-    vector<vector<int>> result(A.size(),v);
-    for (int i = 0; i < A.size(); i++) {
-        for (int j = 0; j < A[0].size(); j++) {
-            result[i][j] = A[i][j] + B[i][j];
+void Add(vector<vector<int>>& M1, vector<vector<int>>& M2, vector<vector<int>>& Res, int count) {
+    for (int i = 0; i < count; i++) {
+        for (int j = 0; j < count; j++) {
+            Res[i][j] = M1[i][j] + M2[i][j];
             k++; // Увеличиваем счетчик скалярных операций
         }
     }
-    return result;
 }
 
 // Функция для вычитания двух матриц
-vector<vector<int>> Sub(const vector<vector<int>>& A, const vector<vector<int>>& B) {
-    vector<int> v(A[0].size(), 0);
-    vector<vector<int>> result(A.size(), v);
-    for (int i = 0; i < A.size(); i++) {
-        for (int j = 0; j < A[0].size(); j++) {
-            result[i][j] = A[i][j] - B[i][j];
+void Sub(vector<vector<int>>& M1, vector<vector<int>>& M2, vector<vector<int>>& Res, int count) {
+    for (int i = 0; i < count; i++) {
+        for (int j = 0; j < count; j++) {
+            Res[i][j] = M1[i][j] - M2[i][j];
             k++; // Увеличиваем счетчик скалярных операций
         }
     }
-    return result;
 }
 
 // Функция для перемножения квадратных матриц по методу Штрассена с учетом количества скалярных операций
-vector<vector<int>> StrassenMult(const vector<vector<int>>& A, const vector<vector<int>>& B) {
-    vector<int> v(A[0].size(), 0);
-    vector<vector<int>> result(A.size(), v);
-    if (A.size() == 1) {
-        result[0][0] = A[0][0] * B[0][0];
-        k++; // Увеличиваем счетчик скалярных операций
+void StrassenMult(vector<vector<int>>& M1, vector<vector<int>>& M2, vector<vector<int>>& Res, int n) {
+    if (n == 1) {
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                for (int d = 0; d < n; d++) {
+                    Res[i][j] += M1[i][j] * M2[j][d];
+                    k += 2; // Увеличиваем счетчик скалярных операций
+                }
+            }
+        }
     }
     else {
         // Разбиваем матрицы на четыре части
-        int newSize = A.size() / 2;
+        int newSize = n / 2;
         vector<vector<int>> A11(newSize, vector<int>(newSize));
         vector<vector<int>> A12(newSize, vector<int>(newSize));
         vector<vector<int>> A21(newSize, vector<int>(newSize));
         vector<vector<int>> A22(newSize, vector<int>(newSize));
+
         vector<vector<int>> B11(newSize, vector<int>(newSize));
         vector<vector<int>> B12(newSize, vector<int>(newSize));
         vector<vector<int>> B21(newSize, vector<int>(newSize));
         vector<vector<int>> B22(newSize, vector<int>(newSize));
 
+        vector<vector<int>> C11(newSize, vector<int>(newSize));
+        vector<vector<int>> C12(newSize, vector<int>(newSize));
+        vector<vector<int>> C21(newSize, vector<int>(newSize));
+        vector<vector<int>> C22(newSize, vector<int>(newSize));
+
+        vector<vector<int>> P1(newSize, vector<int>(newSize));
+        vector<vector<int>> P2(newSize, vector<int>(newSize));
+        vector<vector<int>> P3(newSize, vector<int>(newSize));
+        vector<vector<int>> P4(newSize, vector<int>(newSize));
+        vector<vector<int>> P5(newSize, vector<int>(newSize));
+        vector<vector<int>> P6(newSize, vector<int>(newSize));
+        vector<vector<int>> P7(newSize, vector<int>(newSize));
+
+        vector<vector<int>> res1(newSize, vector<int>(newSize));
+        vector<vector<int>> res2(newSize, vector<int>(newSize));
+
         // Заполняем части матриц
         for (int i = 0; i < newSize; i++) {
             for (int j = 0; j < newSize; j++) {
-                A11[i][j] = A[i][j];
-                A12[i][j] = A[i][j + newSize];
-                A21[i][j] = A[i + newSize][j];
-                A22[i][j] = A[i + newSize][j + newSize];
-                B11[i][j] = B[i][j];
-                B12[i][j] = B[i][j + newSize];
-                B21[i][j] = B[i + newSize][j];
-                B22[i][j] = B[i + newSize][j + newSize];
+                A11[i][j] = M1[i][j];
+                A12[i][j] = M1[i][j + newSize];
+                A21[i][j] = M1[i + newSize][j];
+                A22[i][j] = M1[i + newSize][j + newSize];
+
+                B11[i][j] = M2[i][j];
+                B12[i][j] = M2[i][j + newSize];
+                B21[i][j] = M2[i + newSize][j];
+                B22[i][j] = M2[i + newSize][j + newSize];
             }
         }
         // Вычисляем вспомогательные матрицы
-        vector<vector<int>> P1, P2, P3, P4, P5, P6, P7;
-        StrassenMult(Add(A11, A22), Add(B11, B22)); // P1 = (A11 + A22) * (B11 + B22)
-        StrassenMult(Add(A21, A22), B11); // P2 = (A21 + A22) * B11
-        StrassenMult(A11, Sub(B12, B22)); // P3 = A11 * (B12 - B22)
-        StrassenMult(A22, Sub(B21, B11)); // P4 = A22 * (B21 - B11)
-        StrassenMult(Add(A11, A12), B22); // P5 = (A11 + A12) * B22
-        StrassenMult(Sub(A21, A11), Add(B11, B12)); // P6 = (A21 - A11) * (B11 + B12)
-        StrassenMult(Sub(A12, A22), Add(B21, B22)); // P7 = (A12 - A22) * (B21 + B22)
-
+        // P1 = (A12 - A22) * (B21 + B22)
+        Sub(A12, A22, res1, newSize);
+        Add(B21, B22, res2, newSize);
+        StrassenMult(res1, res2, P1, newSize);
+        // P2 = (A11 + A22) * (B11 + B22)
+        Add(A11, A22, res1, newSize);
+        Add(B11, B22, res2, newSize);
+        StrassenMult(res1, res2, P2, newSize);
+        // P3 = (A11 - A21) * (B11 + B12)
+        Sub(A11, A21, res1, newSize);
+        Add(B11, B12, res2, newSize);
+        StrassenMult(res1, res2, P3, newSize);
+        // P4 = (A11 + A12) * B22
+        Add(A11, A12, res1, newSize);
+        StrassenMult(res1, B22, P4, newSize);
+        // P5 = A11 * (B12 - B22)
+        Sub(B12, B22, res2, newSize);
+        StrassenMult(A11, res2, P5, newSize);
+        // P6 = A22 * (B21 - B11)
+        Sub(B21, B11, res2, newSize);
+        StrassenMult(A22, res2, P6, newSize);
+        // P7 = (A21 + A22) * B11
+        Add(A21, B22, res1, newSize);
+        StrassenMult(res1, B11, P7, newSize);
         // Вычисляем части результирующей матрицы
-        vector<vector<int>> C11 = Add(Sub(Add(P1, P4), P5), P7); // C11 = P1 + P4 - P5 + P7
-        vector<vector<int>> C12 = Add(P3, P5); // C12 = P3 + P5
-        vector<vector<int>> C21 = Add(P2, P4); // C21 = P2 + P4
-        vector<vector<int>> C22 = Add(Sub(Add(P1, P3), P2), P6); // C22 = P1 + P3 - P2 + P6
+        //C11 = P1 + P2 - P6 + P4
+        Add(P1, P2, res1, newSize);
+        Add(res1, P6, res2, newSize);
+        Sub(res2, P4, C11, newSize);
+        //C12 = P4 + P5
+        Add(P4, P5, C12, newSize);
+        //C21 P6 + P7
+        Add(P6, P7, C21, newSize);
+        //C22 = P2 - P3 + P5 - P7
+        Sub(P2, P3, res1, newSize);
+        Add(res1, P5, res2, newSize);
+        Sub(res2, P7, C22, newSize);
 
         // Собираем результирующую матрицу из частей
         for (int i = 0; i < newSize; i++) {
             for (int j = 0; j < newSize; j++) {
-                result[i][j] = C11[i][j];
-                result[i][j + newSize] = C12[i][j];
-                result[i + newSize][j] = C21[i][j];
-                result[i + newSize][j + newSize] = C22[i][j];
+                Res[i][j] = C11[i][j];
+                Res[i][j + newSize] = C12[i][j];
+                Res[i + newSize][j] = C21[i][j];
+                Res[i + newSize][j + newSize] = C22[i][j];
             }
         }
     }
-    return result;
 }
 
-int main() {
-    for (int i = 2; i <= 1024; i *= 2) {
-        vector<vector<int>> A = Generate(i);
-        //print(A);
-        vector < vector<int>> B = Generate(i);
-        //print(B);
-        vector<vector<int>> C = StrassenMult(A, B);
-        cout << "n: " << i << " " << k << endl;
+int main()
+{
+    for (int i = 2; i <= 1024; i *= 2)
+    {
+        Generate(M1, i);
+        //print(M1, i);
+        Generate(M2, i);
+        //print(M2, i);
+        //GenerateNull(i);
         k = 0;
+        StrassenMult(M1, M2, Res, i);
+        cout << i << ":\t" << k << endl;
+        //M1.clear();
+        //M2.clear();
+        //Res.clear();
     }
     return 0;
 }
