@@ -1,87 +1,62 @@
-// пример UDP-клиента
-#define _WINSOCK_DEPRECATED_NO_WARNINGS
-#include <winsock2.h>
-// #include "stdafx.h"
-#include <string>
-#include <windows.h>
-#include <iostream>
-#pragma comment(lib, "ws2_32.lib")
-#pragma warning(disable: 4996)
+#include <iostream> 
+#include<winsock2.h> 
+#pragma comment(lib,"ws2_32.lib") 
+#pragma warning(disable: 4996) 
 using namespace std;
-#define PORT 666
-#define SERVERADDR "127.0.0.1" // IP-адрес сервера
+
+struct Person
+{
+	string name;
+	double a[4];
+};
 
 int main()
 {
-    char buff[10 * 1014];
-    cout << "UDP Demo Client\nType quit to quit \n";
-    // Шаг 1 - иницилизация библиотеки Winsocks
-    if (WSAStartup(0x202, (WSADATA*)&buff))
-    {
-        cout << "WSASTARTUP ERROR: " << WSAGetLastError() << "\n";
-        return -1;
-    }
-    // Шаг 2 - открытие сокета
-    SOCKET my_sock = socket(AF_INET, SOCK_DGRAM, 0); // 1 - домен, 2 - потоковое соеденение, 3 - 0
-    if (my_sock == INVALID_SOCKET) {
-        cout << "SOCKET() ERROR: " << WSAGetLastError() << "\n";
-        WSACleanup(); //Функция прекращает использование библиотеки DLL Winsock
-        return -1;
-    }
-    // Шаг 3 - обмен сообщений с сервером
-    HOSTENT* hst; //структура хоста используется функциями для хранения информациий о данном узле.
-    sockaddr_in Daddr; // Структура SOCKADDR_IN определяет транспортный адрес и порт для семейства адресов AF_INET.
-    //sin_family, sin_port хранятся в sockaddr_in
-    Daddr.sin_family = AF_INET; //адрес домена
-    Daddr.sin_port = htons(PORT); //номер порта транспортного протокола
+	double ans;
+	WSADATA wsa;
+	cout << ("Initialising Winsock...");
+	if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
+	{
+		cout << ("Failed. Error Code : %d", WSAGetLastError());
+		return 1;
+	}
+	cout << "Complete" << endl;
 
-    // определение IP-адреса узла
-    if (inet_addr(SERVERADDR)) //преобразует строку в адрес для структуры
-        Daddr.sin_addr.s_addr = inet_addr(SERVERADDR); // содержит транспорт IPv4 адрес.
-    else
-        if (hst = gethostbyname(SERVERADDR)) // извлекаем информацию о хосте
-            Daddr.sin_addr.s_addr = ((unsigned long**)hst->h_addr_list)[0][0];
-        else {
-            cout << "Unknown Host: " << WSAGetLastError() << "\n";
-            closesocket(my_sock);
-            WSACleanup();
-            return -1;
-        }
-    while (1) {
-        // чтение сообщения с клавиатуры
-        cout << "S<=C:";
-        string SS;
-        getline(cin, SS);
-        if (SS == "quit") break;
+	sockaddr_in serv;
+	serv.sin_addr.s_addr = inet_addr("127.0.0.1");
+	serv.sin_family = AF_INET;
+	serv.sin_port = htons(1234);
+	int from_len = sizeof(serv);
 
-        // Передача сообщений на сервер
-        sendto(my_sock, (char*)&SS[0], SS.size(), 0, (sockaddr*)&Daddr, sizeof(Daddr));
-        //отправляет данные в определенное место назначения, 1-сокет, 2- указатель на буфер содержащий данные,
-        // 3- длина данных в байтах, 4- набор флагов определяющих способ выполнения,
-        // 5- Необязательный указатель на структуру sockaddr, содержащую адрес целевого сокета,
-        // 6-размер адреса в байтах.
-        
-        // Прием сообщения с сервера
-        sockaddr_in SRaddr;
-        int SRaddr_size = sizeof(SRaddr);
-        int n = recvfrom(my_sock, buff, sizeof(buff), 0, (sockaddr*)&SRaddr, &SRaddr_size);
-        //получает данные и сохраняет адрес источника, 1-сокет, 2- буфер для входящих данных,
-        // 3- длина буфера в байтах, 4- Набор параметров, изменяющих поведение вызова функции 
-        // за пределами параметров, указанных для связанного сокета,
-        // 5- Необязательный указатель на буфер в структуре sockaddr, содержащую исходный адрес при возврате,
-        // 6- необязательный указатель на размер буфера в байтах.
-        if (n == SOCKET_ERROR) {
-            cout << "RECVFROM() ERROR:" << WSAGetLastError() << "\n";
-            closesocket(my_sock);
-            WSACleanup();
-            return -1;
-        }
-        buff[n] = '\0';
-        // Вывод принятого с сервера сообщения на экран
-        cout << "S=>C:" << buff << "\n";
-    }
-    // шаг последний - выход
-    closesocket(my_sock); //закрывает существующий сокет
-    WSACleanup();
-    return 0;
+	cout << "Creating socket...";
+	SOCKET KlientSock = socket(AF_INET, SOCK_DGRAM, 0);
+	if (KlientSock == INVALID_SOCKET)
+	{
+		cout << "Failed.";
+		return 1;
+	}
+	cout << "Complete" << endl;
+
+	int prov = 1;
+	Person person;
+	string to;
+	cout << "Start connection to server...";
+	if (connect(KlientSock, (sockaddr*)&serv, sizeof(serv)) != 0)
+	{
+		cout << "Failed.";
+		return 1;
+	}
+	cout << "Complete!" << endl;
+	while (prov == 1)
+	{
+		cout << "Enter name and 4 grades: " << endl;
+		cin >> person.name >> person.a[0] >> person.a[1] >> person.a[2] >> person.a[3];
+		send(KlientSock, (char*)&person, sizeof(person), 0);
+		to = recvfrom(KlientSock, (char*)&ans, 64, 0, 0, 0);
+		cout << "averege score:" << ans;
+		cout << endl << "Continue? 1-yes, 2-no" << endl;
+		cin >> prov;
+	}
+	closesocket(KlientSock);
+	return 0;
 }
