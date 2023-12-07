@@ -1,0 +1,72 @@
+package graf;
+
+public class Graf {
+    public static void main(String[] args) {
+        MyFrame frame = new MyFrame();
+    }    
+}
+/////////////////////
+package graf;
+import javax.swing.*;
+import java.util.*;
+
+public class MyFrame extends JFrame{
+    MyFrame(){
+        setSize(850,300);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        MyPanel panel = new MyPanel();
+        add(panel);
+        setVisible(true);
+    }
+}
+//////////////////////////
+//1)добавить эрэй лист, базовые классы в сам проект
+//2) вызвать конструктор эрэй листа
+//3) в листенере эд от арэй лист
+//4) под кнопкой ентер еще одна кнопка вывести данные и текстэреа
+
+package graf;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.*;
+import java.util.*;
+
+class MyPanel extends JPanel{
+    JLabel l1,l2,l3,l4,l5;
+    JTextField f1,f2,f3,f4,f5;
+    JButton button;
+    
+    MyPanel(){             
+        l1 = new JLabel("Enter Name: ");
+        add(l1);
+        f1 = new JTextField();
+        f1.setColumns(10);
+        add(f1);
+        l2 = new JLabel("Enter Old: ");
+        add(l2);
+        f2 = new JTextField();
+        f2.setColumns(10);
+        add(f2);
+        l3 = new JLabel("Enter Kod: ");
+        add(l3);
+        f3 = new JTextField();
+        f3.setColumns(10);
+        add(f3);
+        l4 = new JLabel("Enter otdel raboti: ");
+        add(l4);
+        f4 = new JTextField();
+        f4.setColumns(10);
+        add(f4);
+        button = new JButton("Enter");
+        MyListener m = new MyListener();
+        button.addActionListener(m);
+        add(button);
+    }
+
+    class MyListener implements ActionListener {
+        public void actionPerformed(ActionEvent  e) {
+            int s1 = Integer.parseInt(f1.getText());
+            int s2 = Integer.parseInt(f2.getText());
+        }
+    }
+}
