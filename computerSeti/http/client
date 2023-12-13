@@ -1,0 +1,94 @@
+// www-client.cpp
+//#include "stdafx.h"
+#include <string>
+#define _WINSOCK_DEPRECATED_NO_WARNINGS  
+// подавление предупреждений библиотеки winsock2
+#include <winsock2.h>
+#include <iostream>
+#pragma comment (lib,"Ws2_32.lib")
+#pragma warning(disable: 4996)  // подавление предупреждения 4996
+using namespace std;
+//html запрос.
+#define max_packet_size   65535
+
+#define LOCAL_SERVER std::string request = "GET/ HTTP/1.1\r\n HOST: localhost \r\n\r\n"; int port = 8000; std::string host_name = "localhost";
+#define INET_SERVER std::string request = "GET/ HTTP/1.1\r\n HOST: www.json.org \r\n\r\n"; int port = 80; std::string host_name = "www.json.org";
+// www.json.org
+
+int main() {
+    INET_SERVER WSADATA ws; //Структура WSADATA содержит сведения о реализации сокетов Windows.
+    SOCKET s;
+    sockaddr_in adr; //определяет транспортный адрес и порт для семейства адресов AF_INET.
+    HOSTENT* hn; //Структура узла используется функциями для хранения сведений о данном узле, таких как имя узла, IPv4-адрес и т. д
+    char buff[max_packet_size];
+    // init
+    if (WSAStartup(0x0202, &ws) != 0) {
+        return -1;
+    }    // error
+
+    // создаём сокет
+    if (INVALID_SOCKET == (s = socket(AF_INET, SOCK_STREAM, 0))) {
+        //1-Семейство адресов IPv4. 2-Тип сокета, обеспечивающий последовательные, надежные, двусторонние потоки байтов
+        //3 - Используемый протокол.
+        return -1;
+    } // error
+
+    // получаем адрес
+    if (NULL == (hn = gethostbyname(host_name.c_str()))) {
+        //Функция gethostbyname извлекает сведения об узле, соответствующие имени узла, из базы данных узла.
+        //c_str. Преобразует содержимое String в строку в стиле C с окончанием нулем
+        return -1;
+    }   // error
+
+    // заполняем  поля структуры adr для использование ее в connect
+    adr.sin_family = AF_INET;
+    ((unsigned long*)&adr.sin_addr)[0] = ((unsigned long**)hn->h_addr_list)[0][0];
+    adr.sin_port = htons(port);
+
+    // устанавливаем соединение с сервером
+    if (SOCKET_ERROR == connect(s, (sockaddr*)&adr, sizeof(adr))) {
+        //Функция connect устанавливает соединение с указанным сокетом.
+        //1-Дескриптор, идентифицирующий неподключенный сокет.
+        //2-Указатель на структуру sockaddr, к которой должно быть установлено соединение.
+        //3-Длина(в байтах) структуры sockaddr, на которую указывает параметр name.
+        int res = WSAGetLastError();
+        return -1;
+    } //error
+
+    // посылаем запрос серверу
+    if (SOCKET_ERROR == send(s, (char*)&request, sizeof(request), 0)) {
+        //Функция send отправляет данные на подключенный сокет.
+        //1-Дескриптор, идентифицирующий подключенный сокет.
+        //2-Указатель на буфер, содержащий передаваемые данные.
+        //3-Длина(в байтах) данных в буфере, на которые указывает параметр buf.
+        //4-Набор флагов, определяющих способ выполнения вызова.Этот параметр создается с помощью побитового оператора OR с любым из следующих значений.
+        int res = WSAGetLastError();
+        return -1;
+    }   // error
+
+    // ждём ответа
+    int len = 0;
+    do {
+        if (SOCKET_ERROR == (len = recv(s, (char*)&buff, max_packet_size, 0))) {
+            //Функция recv получает данные от подключенного сокета или связанного сокета без соединения.
+            //1-Дескриптор, идентифицирующий подключенный сокет.
+            //2-Указатель на буфер для получения входящих данных.
+            //3-Длина буфера(в байтах), на который указывает параметр buf.
+            //4-Набор флагов, влияющих на поведение данной функции.Смотрите примечания ниже.Подробнее о возможном значении этого параметра.
+            int res = WSAGetLastError();
+            return -1;
+        }
+        for (int i = 0; i < len; i++) {
+            cout << buff[i];
+        }
+    } while (len != 0);
+    //получаем данные по частям, пока не len != 0
+    // 
+    // закрываем соединение 
+    if (SOCKET_ERROR == closesocket(s)) {
+        return -1;
+    }  // error
+
+    cin.get();
+    return 1;
+}
