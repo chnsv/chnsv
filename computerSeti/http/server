@@ -1,0 +1,171 @@
+// www-server.cpp
+//#include "stdafx.h"
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <WinSock2.h>
+#include <WS2tcpip.h>
+#pragma comment(lib, "Ws2_32.lib")
+using std::cerr;
+
+int main() {
+    WSADATA wsaData;  //Структура WSADATA содержит сведения о реализации сокетов Windows.
+    int result = WSAStartup(MAKEWORD(2, 2), &wsaData);
+    //Функция WSAStartup инициирует использование winsock DLL процессом.
+    //1-отправляет запрос на версию 2.2 Winsock в системе и задает переданную версию как самую высокую
+    // версию поддержки сокетов Windows, которую может использовать вызывающий объект.
+    //2-Указатель на структуру данных WSADATA для получения сведений о реализации сокетов Windows.
+
+    if (result != 0) {
+        cerr << "WSAStartup failed: " << result << "\n";
+        return result;
+    }
+    struct addrinfo* addr = NULL;
+    //Структура addrinfo используется функцией getaddrinfo для хранения информации об адресе узла.
+    //ai_flags - Флаги, указывающие параметры, используемые в функции getaddrinfo.
+    //ai_family - Адрес семьи.
+    //ai_socktype - Тип 
+    //ai_protocol - Тип протокола.
+    // структура для IP-адреса  сервера
+    struct addrinfo hints;
+    ZeroMemory(&hints, sizeof(hints));
+    hints.ai_family = AF_INET; //Семейство адресов IPv4 (Internet Protocol версии 4).
+    hints.ai_socktype = SOCK_STREAM; //Обеспечивает последовательные, надежные, двусторонние потоки байтов
+    hints.ai_protocol = IPPROTO_TCP;
+    //Протокол TCP.
+    //Это возможное значение, если элемент ai_family имеет значение AF_INET, а элемент ai_socktype — SOCK_STREAM.
+    hints.ai_flags = AI_PASSIVE; //Адрес сокета будет использоваться при вызове функции bind.
+
+    // Инициализируем структуру addr 
+    // HTTP-сервер на 8000-м порту localhost
+    result = getaddrinfo("127.0.0.1", "8000", &hints, &addr);
+    //Функция getaddrinfo обеспечивает независимое от протокола преобразование из имени узла ANSI в адрес.
+    //1-содержит имя узла (узла) или строку числового адреса узла
+    //2-содержит имя службы или номер порта, представленный в виде строки
+    //3-Указатель на структуру addrinfo , которая предоставляет указания
+    //о типе сокета, который поддерживает вызывающий объект.
+    //4-Указатель на связанный список одной или нескольких структур addrinfo,
+    //содержащих сведения об ответе об узле.
+
+    if(result != 0) {
+        cerr << "getaddrinfo failed: " << result << "\n";
+        WSACleanup(); // выгрузка библиотеки Ws2_32.dll
+        return 1;
+    }
+
+    // Создание сокета
+    int listen_socket = socket(addr->ai_family, addr->ai_socktype, addr->ai_protocol);
+    //1-Семейство адресов IPv4. 2-Тип сокета, обеспечивающий последовательные, надежные, 
+    // двусторонние потоки байтов. 3 - Используемый протокол.
+    if (listen_socket == INVALID_SOCKET) {
+        cerr << "Error at socket: " << WSAGetLastError() << "\n";
+        freeaddrinfo(addr);
+        //Функция freeaddrinfo освобождает адресную информацию,
+        //которую функция getaddrinfo динамически выделяет в структурах addrinfo.
+        WSACleanup();
+        //Функция WSACleanup прекращает использование библиотеки DLL Winsock 2.
+        return 1;
+    }
+
+    // Привязываем сокет к IP-адресу
+    result = bind(listen_socket, addr->ai_addr, (int)addr->ai_addrlen);
+    //Функция bind связывает локальный адрес с сокетом.
+    //1Дескриптор, определяющий несвязанный сокет.
+    //2-Указатель на структуру sockaddr локального адреса, назначаемого связанному сокету.
+    //3-Длина(в байтах) значения, на которое указывает addr.
+
+    if (result == SOCKET_ERROR) {
+        cerr << "bind failed with error: " << WSAGetLastError() << "\n";
+        freeaddrinfo(addr);
+        closesocket(listen_socket);
+        WSACleanup();
+        return 1;
+    }
+
+    // Инициализируем слушающий сокет
+    if (listen(listen_socket, SOMAXCONN) == SOCKET_ERROR)
+    //Функция listen переводит сокет в состояние, в котором он прослушивает входящее соединение.
+    {
+        cerr << "listen failed with error: " << WSAGetLastError() << "\n";
+        closesocket(listen_socket);
+        WSACleanup();
+        return 1;
+    }
+    const int max_client_buffer_size = 1024;
+    char buf[max_client_buffer_size];
+    int client_socket = INVALID_SOCKET;
+
+    for (;;) // Принимаем входящие соединения
+    {
+        client_socket = accept(listen_socket, NULL, NULL);
+        //Функция accept разрешает входящую попытку подключения к сокету.
+        //1-Дескриптор, определяющий сокет, который был помещен в состояние прослушивания с помощью функции listen. 
+        //2-Необязательный указатель на буфер, который получает адрес подключающегося объекта
+        //3-Необязательный указатель на целое число, содержащее длину структуры, на которую указывает параметр addr.
+
+        if (client_socket == INVALID_SOCKET)
+        {
+            cerr << "accept failed: " << WSAGetLastError() << "\n";
+            closesocket(listen_socket);
+            WSACleanup();
+            return 1;
+        }
+        result = recv(client_socket, buf, max_client_buffer_size, 0);
+        //Функция recv получает данные от подключенного сокета или связанного сокета без соединения.
+        //1-Дескриптор, идентифицирующий подключенный сокет.
+        //2-Указатель на буфер для получения входящих данных.
+        //3-Длина буфера(в байтах), на который указывает параметр buf.
+        //4-Набор флагов, влияющих на поведение данной функции.Смотрите примечания ниже.Подробнее о возможном значении этого параметра.
+        std::stringstream response; // сюда будет записываться ответ клиенту
+        std::stringstream response_body; // тело ответа
+        if (result == SOCKET_ERROR)
+        {
+            // ошибка получения данных
+            cerr << "recv failed: " << result << "\n";
+            closesocket(client_socket);
+        }
+        else if (result == 0)
+        {
+            // соединение закрыто клиентом
+            cerr << "connection closed...\n";
+        }
+        else if (result > 0)
+        {
+            buf[result] = '\0';   // Данные успешно получены
+       // формируем тело ответа (HTML)
+            response_body << "<title>Test C++ HTTP Server</title>\n"
+                << "<h1>Test page</h1>\n"
+                << "<p>This is body of the test page...</p>\n"
+                << "<h2>Request headers</h2>\n"
+                << "<pre>" << buf << "</pre>\n"
+                << "<em><small>Test C++ Http Server</small></em>\n";
+
+            // Формируем весь ответ вместе с заголовками
+            response << "HTTP/1.1 200 OK\r\n"
+                << "Version: HTTP/1.1\r\n"
+                << "Content-Type: text/html; charset=utf-8\r\n"
+                << "Content-Length: " << response_body.str().length()
+                << "\r\n\r\n"
+                << response_body.str();
+
+            // Отправляем ответ клиенту 
+            result = send(client_socket, response.str().c_str(), response.str().length(), 0);
+            //Функция send отправляет данные на подключенный сокет.
+            //1-Дескриптор, идентифицирующий подключенный сокет.
+            //2-Указатель на буфер, содержащий передаваемые данные.
+            //3-Длина(в байтах) данных в буфере, на которые указывает параметр buf.
+            //4-Набор флагов, определяющих способ выполнения вызова.Этот параметр создается с помощью побитового оператора OR с любым из следующих значений.
+            if (result == SOCKET_ERROR)
+            {    // произошла ошибка при отправке данных
+                cerr << "send failed:" << WSAGetLastError() << "\n";
+            }
+            // Закрываем соединение к клиентом
+            closesocket(client_socket);
+        }
+    } // конец for(;;)
+     // Убираем за собой
+    closesocket(listen_socket);
+    freeaddrinfo(addr);
+    WSACleanup();
+    return 0;
+}
