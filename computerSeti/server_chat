@@ -1,0 +1,191 @@
+#include <iostream>
+#include <winsock2.h> 
+#include <windows.h> 
+#include <string> 
+#include <thread>   // заголовок для работы с потоками
+#include <atomic>   // заголовок для работы с атомарными переменными
+#include <mutex>    // для блокировки доступа к списку и очереди
+#include <vector>
+#include <queue>
+#pragma comment (lib, "Ws2_32.lib")  
+using namespace std;
+
+#define SRV_PORT 1234  // порт сервера (его обязательно должен знать клиент)
+#define BUF_SIZE 64  // размер
+
+struct Message {
+    char name[20];
+    char text[120];
+} message;
+
+atomic<int> count_clients = 0; // количество клиентов онлайн
+mutex clients_lock; // блокировщик доступа к списку клиентов
+mutex wait_message_lock; // блокировщик доступа к очереди неотправленных сообщений
+vector<SOCKET> clients; // список клиентов
+queue<Message> wait_message; // очередь неотправленных сообщений
+
+const string QUEST = "Enter the data\n"; // первый вопрос для клиента, чтобы начать диалог
+
+void send_connect();
+void send_disconnect(Message ara);
+
+void client_geter_thread(SOCKET s_new)
+{
+    send_connect();
+    Message B;
+    while (true) {
+        recv(s_new, (char*)&B, sizeof(B), 0); // получаем сообщение от клиента
+        if (!string(B.text).compare("!exit")) // если сообщение команда на выход, выходим из цикла
+            break;
+        wait_message_lock.lock(); 
+        // блокируем доступ к очереди неотправленных сообщений mutex-ом 
+        wait_message.push(B); 
+        // добавляем новое сообщение в очередь на отправку
+        wait_message_lock.unlock(); 
+        // разблокируем доступ к очереди неотправленных сообщений mutex-ом 
+    }
+    send_disconnect(B);
+    cout << "client is lost" << endl;
+    count_clients.fetch_sub(1); // уменьшаем счетчик клиентов
+    cout << "current connections: " << count_clients.load() << endl;
+    closesocket(s_new);
+}
+
+void client_sendler_thread()
+{
+    while (true)
+    {
+        clients_lock.lock(); 
+        // блокируем доступ к списку клиентов mutex-ом 
+        wait_message_lock.lock(); 
+        // блокируем доступ к очереди неотправленных сообщений mutex-ом 
+        int ar = wait_message.size();
+        Message B;
+        if (ar != 0) {
+            B = wait_message.front(); 
+            //Возвращает ссылку на первое сообщение в начале queue.
+            wait_message.pop(); 
+            //Удаляет сообщение из начала queue.
+        }
+        wait_message_lock.unlock(); 
+        // разблокируем доступ к очереди неотправленных сообщений mutex-ом 
+
+        if (ar != 0) {
+        // если очередь не пуста
+            cout << "send [" << B.name << "]: " << B.text << endl; 
+            // для отладки выводим сообщения на сервере
+            for (unsigned i = 0; i < clients.size(); i++) {
+                int size = send(clients[i], (char*)&B, sizeof(B), 0); 
+                // пытемся отправить сообщение
+                if (size < 0) { // если не получилось
+                    clients.erase(clients.begin() + i); 
+                    // удаляем из списка клиентов клиента с текущем номером
+                    i--;
+                }
+            }
+        }
+        clients_lock.unlock(); 
+        // разблокируем доступ к списку клиентов mutex-ом 
+    }
+}
+
+void send_connect() {
+    Message B;
+    B.name[0] = 's';
+    B.name[1] = 'e';
+    B.name[2] = 'r';
+    B.name[3] = 'v';
+    B.name[4] = 'e';
+    B.name[5] = 'r';
+    B.name[6] = '\0';
+    string dis = "new connect";
+    for (int i = 0; i < dis.length(); i++) {
+        B.text[i] = dis[i];
+    }
+    B.text[dis.length()] = '\0';
+    wait_message_lock.lock(); 
+    // блокируем доступ к очереди неотправленных сообщений mutex-ом 
+    wait_message.push(B);
+    wait_message_lock.unlock(); 
+    // разблокируем доступ к очереди неотправленных сообщений mutex-ом 
+}
+
+void send_disconnect(Message ara) {
+    Message B;
+    B.name[0] = 's';
+    B.name[1] = 'e';
+    B.name[2] = 'r';
+    B.name[3] = 'v';
+    B.name[4] = 'e';
+    B.name[5] = 'r';
+    B.name[6] = '\0';
+    string dis = "disconnected";
+    int a;
+    for (int i = 0; i < 20; i++) {
+        if (ara.name[i] != '\0')
+            B.text[i] = ara.name[i];
+        else {
+            B.text[i] = ' ';
+            a = i + 1;
+        }
+    }
+    for (int i = 0; i < dis.length(); i++, a++) {
+        B.text[a] = dis[i];
+    }
+    B.text[a] = '\0';
+    wait_message_lock.lock(); 
+    // блокируем доступ к очереди неотправленных сообщений mutex-ом 
+    wait_message.push(B);
+    wait_message_lock.unlock(); 
+    // разблокируем доступ к очереди неотправленных сообщений mutex-ом 
+}
+
+int main()
+{
+    setlocale(LC_ALL, "rus");
+    char buff[1024];
+    if (WSAStartup(0x0202, (WSADATA*)&buff[0])) { //Eror!
+        cout << "Error WSAStartup \n" << WSAGetLastError();   // Ошибка!
+        return -1;
+    }
+    SOCKET s;
+    int from_len;
+    sockaddr_in sin;
+    s = socket(AF_INET, SOCK_STREAM, 0);
+    sin.sin_family = AF_INET;
+    sin.sin_addr.s_addr = 0;
+    sin.sin_port = htons(SRV_PORT);
+    bind(s, (sockaddr*)&sin, sizeof(sin));
+    string msg, msg1;
+    listen(s, 6);
+
+    // создаем поток на отправку новых сообщений
+    thread client(client_sendler_thread);
+    client.detach();
+    while (1)
+    {
+        sockaddr_in from_sin;
+        from_len = sizeof(from_sin);
+        SOCKET s_new = accept(s, (sockaddr*)&from_sin, &from_len);
+        if (s_new == INVALID_SOCKET) {
+            cerr << "Error accepting client connection: " << WSAGetLastError() << endl;
+            continue;
+        }
+        else {
+            count_clients.fetch_add(1); 
+            // увеличиваем счетчик клиентов
+            cout << "current connections: " << count_clients.load() << endl;
+            clients_lock.lock(); 
+            // блокируем доступ к списку клиентов mutex-ом 
+            clients.push_back(s_new); 
+            // добавляем нового клиента в список
+            clients_lock.unlock(); 
+            // разблокируем доступ к списку клиентов mutex-ом 
+            thread client(client_geter_thread, s_new); 
+            // Создаем новый поток для принятия сообщений от клиента s_new
+            client.detach();  
+            // отсоединяем поток, чтобы он продолжал работу независимо, т.е. создаем демона
+        }
+    }
+    return 0;
+}
