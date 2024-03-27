@@ -1,0 +1,65 @@
+#include <iostream>
+#include <thread>
+#include <ctime>
+using namespace std;
+
+//1 potok
+
+//int main()
+//{
+//    srand(time(NULL));
+//    long int n = 1000000;
+//    long long int s = 0;
+//    int* a = new int[n];
+//    for (int i = 0; i < n; i++) {
+//        a[i] = rand();
+//    }
+//    unsigned t = clock();
+//    for (int i = 0; i < n; i++) {
+//        s += a[i];
+//    }
+//    unsigned t1 = clock();
+//    cout << "Summa = " << s << endl;
+//    cout << "Time: " << t1 - t << " ms";
+//}
+
+//4 potoka
+int main() {
+	long long s1 = 0, s2 = 0, s3 = 0, s4 = 0;
+	double t1 = 0, t2 = 0, t3 = 0, t4 = 0, t5 = 0, t6 = 0, t7 = 0, t8 = 0, o1 = 0, o2 = 0, o3 = 0, o4 = 0;
+	thread tt1([&]() {
+		t1 = clock();
+		for (int i = 0; i < 250000; i++)
+			s1 += 1;
+		t2 = clock();
+		o1 += t2 - t1;
+		});
+	thread tt2([&]() {
+		t3 = clock();
+		for (int i = 0; i < 250000; i++)
+			s2 += 1;
+		t4 = clock();
+		o2 += t4 - t3;
+		});
+	thread tt3([&]() {
+		t5 = clock();
+		for (int i = 0; i < 250000; i++)
+			s3 += 1;
+		t6 = clock();
+		o3 += t6 - t5;
+		});
+	thread tt4([&]() {
+		t7 = clock();
+		for (int i = 0; i < 250000; i++)
+			s4 += 1;
+		t8 = clock();
+		o4 += t8 - t7;
+		});
+	tt1.join();
+	tt2.join();
+	tt3.join();
+	tt4.join();
+
+	cout << "Summa = " << s1 + s2 + s3 + s4 << endl;
+	cout << "Time: " << o1 + o2 + o3 + o4;
+}
