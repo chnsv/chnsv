@@ -1,0 +1,64 @@
+#define _USE_MATH_DEFINES
+#include <iostream>
+using namespace std;
+
+int main()
+{
+    setlocale(LC_ALL, "RUS");
+    double left = M_PI, right = 1.5 * M_PI, per = 4, eps = 0.001, x;
+    _asm {
+        fld left
+        fld right
+        fadd
+        fld per
+        fdiv
+        fstp x
+
+        m1:
+            fld x
+            fld st(0)
+            f2xm1
+            fld1
+            fadd
+            fyl2x
+            fstp st(1)
+            fld x
+            fsin
+            fld1
+            fmul
+            fadd
+            fcomi st(0), st(1)
+            jg m2
+            jl m3
+            jmp m5
+
+        m2:
+            fld x
+            fstp right
+            jmp m4
+
+        m3:
+            fld x
+            fstp left
+            jmp m4
+
+        m4:
+            fld left
+            fld right
+            fadd
+            fdiv
+            fstp x
+            fld right
+            fld left
+            fsub
+            fabs
+            fld eps
+            fcomi st(0), st(1)
+            jae m1
+
+        m5:
+            fstp x
+    }
+    cout << "Корень уравнения = " << x;
+    return 0;
+}
