@@ -1,0 +1,56 @@
+#include <iostream>
+using namespace std;
+
+int main()
+{
+    int n, m, k, f=0;
+    cin >> n >> m;
+
+    _asm {
+        mov eax, n
+        mov ebx, m
+        cmp eax, ebx
+        je first
+        jb second
+        ja close
+
+        first:
+        mov f, 1
+        jmp close
+
+        second:
+        mov ecx, m
+        mov bx, 1
+        mov eax, 1
+        metka2: mul bx
+        inc bx
+        loop metka2
+        mov k, eax
+
+        mov ecx, n
+        mov bx, 1
+        mov eax, 1
+        metka: mul bx
+        inc bx
+        loop metka
+
+        mov ecx, m
+        mov bx, 1
+        sub ecx, n
+        metka1: mul bx
+        inc bx
+        loop metka1
+
+        mov ebx, eax
+        mov eax, k
+        mov edx, eax
+        shr edx, 16
+        div ebx
+
+        mov f, eax
+        jmp close
+
+        close:
+    }
+    cout << f;
+}
