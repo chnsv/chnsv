@@ -1,0 +1,100 @@
+#include <iostream>
+using namespace std;
+
+void multiply(int* a, int* b, int* c, int n)
+{
+    _asm
+    {
+        mov edi, a
+        mov esi, b
+        mov ebx, c
+        mov edx, n
+        
+        m1:
+        mov ecx, n
+        push edx
+            
+        m2:    
+        mov eax, 0
+        mov[ebx], eax
+        push ecx
+        mov ecx, n
+
+        m3: 
+        mov eax, [edi]
+        mov edx, [esi]
+        imul edx
+        add[ebx], eax
+        add edi, 4
+        mov eax, 4
+        mov edx, n
+        imul edx
+        add esi, eax
+
+        loop m3
+
+        add ebx, 4
+        mov ecx, n
+        mov eax, 4
+        imul ecx
+        sub edi, eax
+        mov eax, 4
+        mov edx, n
+        imul edx
+        imul ecx
+        sub esi, eax
+        add esi, 4
+        pop ecx
+
+        loop m2
+
+        mov eax, 4
+        mov edx, n
+        imul edx
+        add edi, eax
+        mov esi, b
+        pop edx
+        dec edx
+
+        jnz m1
+        mov eax, 1
+        jmp EXIT
+
+        EXIT: 
+        mov esp, ebp
+        pop ebp
+        ret   
+    }
+}
+
+int main()
+{
+    setlocale(LC_ALL, "RUS");
+    int* a, * b, * c, n;
+    cout << "Введите n: ";
+    cin >> n;
+    a = (int*)malloc(n * n * sizeof(int));
+    b = (int*)malloc(n * n * sizeof(int));
+    c = (int*)malloc(n * n * sizeof(int));
+    cout << "Введите первую матрицу" << endl;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            cin >> a[i * n + j];
+        }
+    }
+    cout << "Введите вторую матрицу" << endl;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            cin >> b[i * n + j];
+        }
+    }
+    multiply(a, b, c, n);
+    cout << "Произведение матриц: " << endl;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            cout << c[i * n + j] << " ";
+        }
+        cout << endl;
+    }
+    system("pause");
+}
