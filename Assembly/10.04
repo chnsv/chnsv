@@ -1,0 +1,78 @@
+#include <iostream>
+#include <thread>
+#include <random>
+#include <chrono>
+#include <vector>
+using namespace std;
+
+vector<vector<int>> generateMatrix(int size) {
+	vector<vector<int>>matrix(size, vector<int>(size, 0));
+	random_device rd;
+	mt19937 gen(rd());
+	uniform_int_distribution<>dis(0, 1);
+	for (int i = 0; i < size; i++) {
+		for (int j = i + 1; j < size; j++) {
+			matrix[i][j] = matrix[j][i] = dis(gen);
+		}
+	}
+	return matrix;
+}
+vector<vector<int>> makeIsoMatrix(const vector<vector<int>>& matrix) {
+	int size = matrix.size();
+	vector<vector<int>> isoMatrix(size, vector<int>(size, 0));
+	for (int i = 0; i < size; i++) {
+		for (int j = i + 1; j < size; j++) {
+			if (matrix[i][j] == 1) {
+				isoMatrix[i][j] = 1;
+			}
+		}
+	}
+	return isoMatrix;
+}
+bool isIsomorf(const vector<vector<int>>matrix1, const vector<vector<int>> matrix2) {
+	if (matrix1.size() != matrix2.size())
+		return false;
+	for (int i = 0; i < matrix1.size(); i++) {
+		for (int j = 0; j < matrix1.size(); j++) {
+			if (matrix1[i][j] != matrix2[i][j])
+				return false;
+		}
+	}
+	return true;
+}
+void printMatrix(const vector<vector<int>>& matrix) {
+	for (const auto& row : matrix) {
+		for (int val : row) {
+			cout << val << " ";
+		}
+		cout << endl;
+	}
+}
+int main()
+{
+	int size;
+	cout << "Enter size matrix: ";
+	cin >> size;
+	auto start = chrono::high_resolution_clock::now();
+	auto matrix = generateMatrix(size);
+	cout << endl;
+	thread printThread([&matrix]() {
+		cout << endl << "First matrix: " << endl;
+		printMatrix(matrix);
+		cout << endl;
+		});
+	cout << endl;
+	auto isoMatrix = makeIsoMatrix(matrix);
+	thread printIIsoThread([&isoMatrix]() {
+		cout << "Iso matrix: " << endl;
+		printMatrix(isoMatrix);
+		cout << endl;
+		});
+	printThread.join();
+	printIIsoThread.join();
+	bool isIso = isIsomorf(matrix, isoMatrix);
+	auto end = chrono::high_resolution_clock::now();
+	chrono::duration<double> elapsed = end - start;
+	cout << "Matrix " << (isIso ? "isomorf" : "not isomorf") << endl;
+	cout << "Time: " << elapsed.count() << "ms" << endl;
+}
