@@ -1,0 +1,51 @@
+#include <iostream>
+#include <thread>
+#include < mutex>
+#include < chrono>
+#include <Windows.h>
+using namespace std;
+
+struct Ball {
+	double x, y;
+	double speed;
+	double distanceToEnd;
+};
+Ball ball1 = { 0,0,1,100 }; // 0,0 - начало координат, 1- скорость, 100- расстояние до конца
+Ball ball2 = { 0,0,5,100 };
+mutex mtx;
+void moveBall1() {
+	while (ball1.distanceToEnd > 0) {
+		ball1.x += ball1.speed;
+		ball1.y += ball1.speed;
+		ball1.distanceToEnd -= ball1.speed;
+
+		lock_guard<mutex> lock(mtx);
+		cout << "Current time: " << chrono::system_clock::now().time_since_epoch().count() << ", (" << ball1.x << ", " << ball1.y << ")   (" << ball2.x << ", " << ball2.y << ")\n";
+		Sleep(1000);
+		this_thread::sleep_for(chrono::milliseconds(100));
+	}
+	lock_guard<mutex> lock(mtx);
+	cout << "BUM for ball 1!\n";
+}
+void moveBall2() {
+	while (ball2.distanceToEnd > 0) {
+		ball2.x += ball2.speed;
+		ball2.y += ball2.speed;
+		ball2.distanceToEnd -= ball2.speed;
+
+		lock_guard<mutex> lock(mtx);
+		cout << "Current time: " << chrono::system_clock::now().time_since_epoch().count() << ", (" << ball1.x << ", " << ball1.y << ")   (" << ball2.x << ", " << ball2.y << ")\n";
+		Sleep(1000);
+		this_thread::sleep_for(chrono::milliseconds(100));
+	}
+	lock_guard<mutex> lock(mtx);
+	cout << "BUM for ball 2!\n";
+}
+int main()
+{
+
+	thread t1(moveBall1);
+	thread t2(moveBall2);
+	t1.join();
+	t2.join();
+}
