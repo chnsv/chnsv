@@ -1,51 +1,55 @@
 #include <iostream>
 #include <thread>
-#include < mutex>
-#include < chrono>
-#include <Windows.h>
+#include <mutex>
+#include <chrono>
+#include <iomanip> // Для использования std::fixed и std::setprecision
 using namespace std;
 
 struct Ball {
-	double x, y;
-	double speed;
-	double distanceToEnd;
+    double x, y;
+    double speed;
+    double distanceToEnd;
 };
+
 Ball ball1 = { 0,0,1,100 }; // 0,0 - начало координат, 1- скорость, 100- расстояние до конца
-Ball ball2 = { 0,0,5,100 };
+Ball ball2 = { 0,0,5,100 }; // 0,0 - начало координат, 5- скорость, 100- расстояние до конца
 mutex mtx;
-void moveBall1() {
-	while (ball1.distanceToEnd > 0) {
-		ball1.x += ball1.speed;
-		ball1.y += ball1.speed;
-		ball1.distanceToEnd -= ball1.speed;
 
-		lock_guard<mutex> lock(mtx);
-		cout << "Current time: " << chrono::system_clock::now().time_since_epoch().count() << ", (" << ball1.x << ", " << ball1.y << ")   (" << ball2.x << ", " << ball2.y << ")\n";
-		Sleep(1000);
-		this_thread::sleep_for(chrono::milliseconds(100));
-	}
-	lock_guard<mutex> lock(mtx);
-	cout << "BUM for ball 1!\n";
+// Статическая переменная для хранения текущего времени
+static double currentTime = 1.0;
+
+void printCoordinates() {
+    lock_guard<mutex> lock(mtx);
+    cout << "Current time: " << fixed << setprecision(2) << currentTime << "s, Ball 1: (" << ball1.x << ", " << ball1.y << "), Ball 2: (" << ball2.x << ", " << ball2.y << ")\n";
+    // Увеличиваем текущее время на 1 секунду
+    currentTime += 1.0;
 }
-void moveBall2() {
-	while (ball2.distanceToEnd > 0) {
-		ball2.x += ball2.speed;
-		ball2.y += ball2.speed;
-		ball2.distanceToEnd -= ball2.speed;
 
-		lock_guard<mutex> lock(mtx);
-		cout << "Current time: " << chrono::system_clock::now().time_since_epoch().count() << ", (" << ball1.x << ", " << ball1.y << ")   (" << ball2.x << ", " << ball2.y << ")\n";
-		Sleep(1000);
-		this_thread::sleep_for(chrono::milliseconds(100));
-	}
-	lock_guard<mutex> lock(mtx);
-	cout << "BUM for ball 2!\n";
+void moveBall(Ball& ball) {
+    while (ball.distanceToEnd > 0) {
+        ball.x += ball.speed;
+        ball.y += ball.speed;
+        ball.distanceToEnd -= ball.speed;
+
+        this_thread::sleep_for(chrono::milliseconds(500)); // Обновление каждые 500 мс
+    }
+    lock_guard<mutex> lock(mtx);
+    cout << "BUM for ball " << (&ball == &ball1 ? "1" : "2") << "!\n";
 }
-int main()
-{
 
-	thread t1(moveBall1);
-	thread t2(moveBall2);
-	t1.join();
-	t2.join();
+void updateTime() {
+    while (true) {
+        this_thread::sleep_for(chrono::seconds(1));
+        printCoordinates();
+    }
+}
+
+int main() {
+    thread t1(moveBall, ref(ball1));
+    thread t2(moveBall, ref(ball2));
+    thread t3(updateTime); // Отдельный поток для обновления времени и вывода координат
+
+    t1.join();
+    t2.join();
+    t3.join(); // Ожидание завершения потока обновления времени
 }
